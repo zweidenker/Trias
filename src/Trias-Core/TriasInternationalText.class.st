@@ -5,7 +5,7 @@ Class {
 		'text',
 		'language'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Model'
 }
 
 { #category : #testing }

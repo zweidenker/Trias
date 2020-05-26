@@ -1,7 +1,7 @@
 Class {
 	#name : #TriasPointOfInterestName,
 	#superclass : #TriasInternationalText,
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Model'
 }
 
 { #category : #'as yet unclassified' }

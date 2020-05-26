@@ -6,7 +6,7 @@ Class {
 		'name',
 		'localityReference'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Model'
 }
 
 { #category : #'as yet unclassified' }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'currentObject'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Visitor'
 }
 
 { #category : #visiting }

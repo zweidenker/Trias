@@ -8,7 +8,7 @@ Class {
 	#classInstVars : [
 		'current'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Model'
 }
 
 { #category : #accessing }

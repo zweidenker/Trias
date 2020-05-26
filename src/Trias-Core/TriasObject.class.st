@@ -1,7 +1,7 @@
 Class {
 	#name : #TriasObject,
 	#superclass : #Object,
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Model'
 }
 
 { #category : #'as yet unclassified' }

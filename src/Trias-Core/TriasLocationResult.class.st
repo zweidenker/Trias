@@ -7,7 +7,7 @@ Class {
 		'probability',
 		'mode'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Model'
 }
 
 { #category : #'as yet unclassified' }

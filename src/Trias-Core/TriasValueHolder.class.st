@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'trias'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Base'
 }
 
 { #category : #accessing }

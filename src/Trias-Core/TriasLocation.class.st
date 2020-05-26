@@ -8,7 +8,7 @@ Class {
 		'locality',
 		'poi'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Model'
 }
 
 { #category : #'as yet unclassified' }

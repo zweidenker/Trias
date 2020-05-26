@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'elementRootClass'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Core-Base'
 }
 
 { #category : #'as yet unclassified' }

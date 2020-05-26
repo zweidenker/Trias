@@ -7,7 +7,7 @@ Class {
 	#classInstVars : [
 		'requestorRef'
 	],
-	#category : #'Trias-Core'
+	#category : #'Trias-Client'
 }
 
 { #category : #accessing }
