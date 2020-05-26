@@ -11,11 +11,11 @@ BaselineOfTrias >> baseline: spec [
    		spec
 			package: 'Trias-Core' with: [ spec requires: #('XMLParser') ];
 			package: 'Trias-Client' with: [ spec requires: #('Trias-Core' 'Mustache') ];
-			package: 'Trias-Schema' with: [ spec requires: #('Trias-Core' 'Trias-Client' 'XmlSchema') ];
+			package: 'Trias-Schema' with: [ spec requires: #('Trias-Core' 'Trias-Client' 'XMLSchema') ];
 			package: 'Trias-Core-Tests' with: [ spec requires: #('Trias-Core') ].
 
 		spec
-			group: 'default' with: #('Trias-Core' 'Trias-Client' 'Trias-Schema' 'tests');
+			group: 'default' with: #('Trias-Core' 'Trias-Client' 'Trias-Schema' 'Tests');
 			group: 'Tests' with: #('Trias-Core-Tests');
 			group: 'Core' with: #('Trias-Core');
 			group: 'Client' with: #('Trias-Client').
