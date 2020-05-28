@@ -9,9 +9,9 @@ Class {
 
 { #category : #visiting }
 TriasNodeVisitor >> visitDocument: aDocument [
-	currentObject := TriasValueHolder new.
+	currentObject := Trias new.
 	self visitNodeWithElements: aDocument.
-	^ currentObject trias
+	^ currentObject 
 ]
 
 { #category : #visiting }

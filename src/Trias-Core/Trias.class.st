@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'locationResult',
-		'schemas'
+		'schemas',
+		'serviceDelivery'
 	],
 	#classInstVars : [
 		'current'
@@ -25,4 +26,14 @@ Trias >> locationResult: aResult [
 { #category : #accessing }
 Trias >> schemas: aXSDSchemaSet [ 
 	schemas := aXSDSchemaSet 
+]
+
+{ #category : #'as yet unclassified' }
+Trias >> serviceDelivery: aTriasServiceDelivery [ 
+	serviceDelivery := aTriasServiceDelivery 
+]
+
+{ #category : #'as yet unclassified' }
+Trias >> translateName: aString [ 
+	^ aString
 ]
