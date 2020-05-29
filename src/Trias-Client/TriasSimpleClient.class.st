@@ -2,7 +2,8 @@ Class {
 	#name : #TriasSimpleClient,
 	#superclass : #Object,
 	#instVars : [
-		'url'
+		'url',
+		'timeout'
 	],
 	#classInstVars : [
 		'requestorRef'
@@ -10,15 +11,62 @@ Class {
 	#category : #'Trias-Client'
 }
 
-{ #category : #accessing }
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterHookFor: aParameterName [
+
+	^ '{{' , aParameterName , '}}'
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterLocationName [
+
+	^ #locationName
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterRequestorRef [
+
+	^ #requestorRef
+]
+
+{ #category : #'accessing - request parameters' }
 TriasSimpleClient class >> requestorRef [
 	^ requestorRef ifNil: [ 
 		Error signal: 'RequestorRef has to be set' ]
 ]
 
-{ #category : #accessing }
+{ #category : #'accessing - request parameters' }
 TriasSimpleClient class >> requestorRef: anObject [
 	requestorRef := anObject
+]
+
+{ #category : #accessing }
+TriasSimpleClient class >> scriptGenerateStopRequestTemplate [
+
+		| mainSchemaFile schemas req xml xmlString |
+	mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
+schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+		
+req := (schemas findElementNamed: #Trias) newValue.
+req beSelfExpanding.
+req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
+req ServiceRequest RequestPayload LocationInformationRequest InitialInput LocationName: (self parameterHookFor: self parameterLocationName).
+req ServiceRequest RequestPayload LocationInformationRequest Restrictions IncludePtModes: 'true'.
+xml := PluggableXMLVisitor new
+	visit: req name: 'Trias';
+	document.
+	
+xml 
+	version: '1.1';
+	encoding: 'utf-8'.
+xml root attributeAt: 'version' put: '1.1'.
+
+xmlString := String streamContents: [ :stream | | writer |
+	writer := (XMLWriter on: stream)
+		enablePrologPrettyPrinting.
+	xml writeXMLOn: writer ].
+
+^ xmlString
 ]
 
 { #category : #'as yet unclassified' }
@@ -36,6 +84,35 @@ TriasSimpleClient >> dataRequestString [
         </RequestPayload>
     </ServiceRequest>
 </Trias>'
+]
+
+{ #category : #accessing }
+TriasSimpleClient >> defaultRequestParameters [
+	^ { 
+		self class parameterRequestorRef  -> (self class requestorRef) } asDictionary 
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters [
+
+	| client response |
+	client := ZnClient new 
+		timeout: self timeout;
+		url: self url;
+		entity: (ZnEntity xml: (self process: aRequestTemplateString with: mustacheParameters)).
+	response := client post.
+	^response
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getLocations: aLocationPatternString [
+
+	| response triasDocument trias |
+	response := self execute: self templateStopRequest with: (self defaultRequestParameters at: self class parameterLocationName put: aLocationPatternString ; yourself).
+	triasDocument := XMLDOMParser parse: response.
+	trias := TriasNodeVisitor new
+		visitDocument: triasDocument.
+	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
 ]
 
 { #category : #'as yet unclassified' }
@@ -82,6 +159,11 @@ TriasSimpleClient >> process: aString [
 	^ aString asMustacheTemplate value: self requestParameters
 ]
 
+{ #category : #'private - templates' }
+TriasSimpleClient >> process: aString with: aDictionary [
+	^ aString asMustacheTemplate value: aDictionary
+]
+
 { #category : #'as yet unclassified' }
 TriasSimpleClient >> requestData [
 
@@ -119,6 +201,26 @@ TriasSimpleClient >> requestTrip [
 		entity: (ZnEntity xml: (self process: self tripRequestString)).
 	response := client post.
 	^response
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateStopRequest [
+"self scriptGenerateStopRequestTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><LocationInformationRequest><InitialInput><LocationName>{{locationName}}</LocationName></InitialInput><Restrictions><IncludePtModes>true</IncludePtModes></Restrictions></LocationInformationRequest></RequestPayload></ServiceRequest></Trias>'
+]
+
+{ #category : #accessing }
+TriasSimpleClient >> timeout [ 
+
+	^ timeout ifNil: [ timeout :=  120 ]
+]
+
+{ #category : #accessing }
+TriasSimpleClient >> timeout: aNumberOfSeconds [
+
+	timeout := aNumberOfSeconds
 ]
 
 { #category : #'as yet unclassified' }
