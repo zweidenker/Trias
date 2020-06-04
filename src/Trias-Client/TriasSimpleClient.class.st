@@ -207,7 +207,7 @@ TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters [
 
 { #category : #requesting }
 TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults [
-	| response triasDocument trias |
+	| response triasDocument responseElement |
 	response := self
 		execute: self templateEventsRequest
 		with:
@@ -221,9 +221,11 @@ TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDur
 				yourself).
 	triasDocument := XMLDOMParser parse: response.
 	
-	trias := TriasNodeVisitor new visitDocument: triasDocument.
-	^ trias trias serviceDelivery deliveryPayload
-		locationInformationResponse locationResults
+	responseElement := (triasDocument findElementNamed: 'StopEventResponse').
+	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
+	^ (responseElement allElementsNamed: 'StopEventResult') collect: [:eachXMLElement | 
+		TriasEventResult fromXML: eachXMLElement
+		].
 ]
 
 { #category : #requesting }
