@@ -11,6 +11,72 @@ Class {
 	#category : #'Trias-Client'
 }
 
+{ #category : #accessing }
+TriasSimpleClient class >> eventTypeArrival [
+
+	"<xs:restriction base=""xs:string"">
+			<xs:enumeration value=""departure""/>
+			<xs:enumeration value=""arrival""/>
+			<xs:enumeration value=""both""/>
+		</xs:restriction>"
+		
+	^ 'arrival'.
+]
+
+{ #category : #accessing }
+TriasSimpleClient class >> eventTypeBoth [
+
+	"<xs:restriction base=""xs:string"">
+			<xs:enumeration value=""departure""/>
+			<xs:enumeration value=""arrival""/>
+			<xs:enumeration value=""both""/>
+		</xs:restriction>"
+		
+	^ 'both'.
+]
+
+{ #category : #accessing }
+TriasSimpleClient class >> eventTypeDeparture [
+
+	"<xs:restriction base=""xs:string"">
+			<xs:enumeration value=""departure""/>
+			<xs:enumeration value=""arrival""/>
+			<xs:enumeration value=""both""/>
+		</xs:restriction>"
+		
+	^ 'departure'.
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterEventsLocationId [
+
+	^ #eventsLocationId
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterEventsNumberOfResults [
+
+	^ #eventsNumberOfResults
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterEventsStartTimestamp [
+
+	^ #eventsStartTimestamp
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterEventsTimeWindow [
+
+	^ #eventsTimeWindow
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterEventsType [
+
+	^ #eventsType
+]
+
 { #category : #'accessing - request parameters' }
 TriasSimpleClient class >> parameterHookFor: aParameterName [
 
@@ -38,6 +104,41 @@ TriasSimpleClient class >> requestorRef [
 { #category : #'accessing - request parameters' }
 TriasSimpleClient class >> requestorRef: anObject [
 	requestorRef := anObject
+]
+
+{ #category : #accessing }
+TriasSimpleClient class >> scriptEventResponseXSD [
+		| mainSchemaFile schemas element |
+	mainSchemaFile := '../trias/Trias.xsd' asFileReference.
+	schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+	element := ((schemas findElementNamed: #Trias) resolveElement: 'StopEventResponse').
+]
+
+{ #category : #accessing }
+TriasSimpleClient class >> scriptGenerateEventRequestTemplate [
+	| mainSchemaFile schemas req xml xmlString |
+	mainSchemaFile := '../trias/Trias.xsd' asFileReference.
+	schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+	req := (schemas findElementNamed: #Trias) newValue.
+	req beSelfExpanding.
+	req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
+	req ServiceRequest RequestPayload StopEventRequest Location
+		LocationRef StopPointRef:  (self parameterHookFor: self parameterEventsLocationId).
+	req ServiceRequest RequestPayload StopEventRequest Location
+		DepArrTime:  (self parameterHookFor: self parameterEventsStartTimestamp).
+	req ServiceRequest RequestPayload StopEventRequest Params NumberOfResults: (self parameterHookFor: self parameterEventsNumberOfResults); TimeWindow: (self parameterHookFor: self parameterEventsTimeWindow); StopEventType: (self parameterHookFor: self parameterEventsType).
+	xml := PluggableXMLVisitor new
+		visit: req name: 'Trias';
+		document.
+	xml
+		version: '1.1';
+		encoding: 'utf-8'.
+	xml root attributeAt: 'version' put: '1.1'.
+	xmlString := String
+		streamContents: [ :stream | 
+			| writer |
+			writer := (XMLWriter on: stream) enablePrologPrettyPrinting.
+			xml writeXMLOn: writer ]
 ]
 
 { #category : #accessing }
@@ -102,6 +203,29 @@ TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters [
 		entity: (ZnEntity xml: (self process: aRequestTemplateString with: mustacheParameters)).
 	response := client post.
 	^response
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults [
+	| response triasDocument responseElement |
+	response := self
+		execute: self templateEventsRequest
+		with:
+			(self defaultRequestParameters
+				at: self class parameterEventsLocationId put: locationId;
+				at: self class parameterEventsStartTimestamp put: aDateAndTime printString;
+				at: self class parameterEventsTimeWindow put: aDurationString;
+				at: self class parameterEventsType put: eventType;
+				at: self class parameterEventsNumberOfResults
+					put: maximumNumberOfResults;
+				yourself).
+	triasDocument := XMLDOMParser parse: response.
+	
+	responseElement := (triasDocument findElementNamed: 'StopEventResponse').
+	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
+	^ (responseElement allElementsNamed: 'StopEventResult') collect: [:eachXMLElement | 
+		TriasEventResult fromXML: eachXMLElement
+		].
 ]
 
 { #category : #requesting }
@@ -201,6 +325,14 @@ TriasSimpleClient >> requestTrip [
 		entity: (ZnEntity xml: (self process: self tripRequestString)).
 	response := client post.
 	^response
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateEventsRequest [
+"self scriptGenerateEventRequestTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><StopEventRequest><Location><LocationRef><StopPointRef>{{eventsLocationId}}</StopPointRef></LocationRef><DepArrTime>{{eventsStartTimestamp}}</DepArrTime></Location><Params><NumberOfResults>{{eventsNumberOfResults}}</NumberOfResults><TimeWindow>{{eventsTimeWindow}}</TimeWindow><StopEventType>{{eventsType}}</StopEventType></Params></StopEventRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #'private - templates' }
