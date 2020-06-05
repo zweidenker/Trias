@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'locationResult',
 		'schemas',
-		'serviceDelivery'
+		'serviceDelivery',
+		'trias'
 	],
 	#classInstVars : [
 		'current'
@@ -36,4 +37,16 @@ Trias >> serviceDelivery: aTriasServiceDelivery [
 { #category : #'as yet unclassified' }
 Trias >> translateName: aString [ 
 	^ aString
+]
+
+{ #category : #accessing }
+Trias >> trias [
+
+	^ trias
+]
+
+{ #category : #accessing }
+Trias >> trias: anObject [
+
+	trias := anObject
 ]
