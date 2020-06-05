@@ -14,8 +14,18 @@ TriasGeoPosition class >> xmlElementName [
 ]
 
 { #category : #accessing }
+TriasGeoPosition >> latitude [
+	^ latitude
+]
+
+{ #category : #accessing }
 TriasGeoPosition >> latitude: aString [ 
 	latitude := aString
+]
+
+{ #category : #accessing }
+TriasGeoPosition >> longitude [
+	^ longitude
 ]
 
 { #category : #accessing }
