@@ -15,6 +15,11 @@ TriasStopPoint class >> xmlElementName [
 ]
 
 { #category : #accessing }
+TriasStopPoint >> localityRef [
+	^ localityReference 
+]
+
+{ #category : #accessing }
 TriasStopPoint >> localityRef: aString [ 
 	localityReference := aString
 ]
@@ -28,8 +33,18 @@ TriasStopPoint >> printOn: aStream [
 ]
 
 { #category : #accessing }
+TriasStopPoint >> stopPointName [
+	^ name 
+]
+
+{ #category : #accessing }
 TriasStopPoint >> stopPointName: aTriasStopPointName [ 
 	name := aTriasStopPointName 
+]
+
+{ #category : #accessing }
+TriasStopPoint >> stopPointRef [
+	^ reference 
 ]
 
 { #category : #accessing }

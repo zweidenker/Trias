@@ -17,8 +17,18 @@ TriasLocation class >> xmlElementName [
 ]
 
 { #category : #accessing }
+TriasLocation >> geoPosition [
+	^ geoPosition 
+]
+
+{ #category : #accessing }
 TriasLocation >> geoPosition: aTriasGeoPosition [ 
 	geoPosition := aTriasGeoPosition 
+]
+
+{ #category : #accessing }
+TriasLocation >> locality [
+	^ locality
 ]
 
 { #category : #accessing }
@@ -43,6 +53,11 @@ TriasLocation >> printOn: aStream [
 	locality ifNotNil: [ locality printOn: aStream ].
 	stopPoint ifNotNil: [ stopPoint printOn: aStream ].
 	poi ifNotNil: [ poi printOn: aStream ]
+]
+
+{ #category : #accessing }
+TriasLocation >> stopPoint [
+	^ stopPoint 
 ]
 
 { #category : #accessing }
