@@ -24,6 +24,11 @@ TriasInternationalText >> printOn: aStream [
 ]
 
 { #category : #accessing }
+TriasInternationalText >> text [
+	^ text 
+]
+
+{ #category : #accessing }
 TriasInternationalText >> text: aString [ 
 	text := aString
 ]
