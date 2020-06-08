@@ -6,7 +6,8 @@ Class {
 		'name',
 		'geoPosition',
 		'locality',
-		'poi'
+		'poi',
+		'address'
 	],
 	#category : #'Trias-Core-Model'
 }
@@ -14,6 +15,16 @@ Class {
 { #category : #'as yet unclassified' }
 TriasLocation class >> xmlElementName [ 
 	^ 'Location'
+]
+
+{ #category : #accessing }
+TriasLocation >> address [
+	^ address 
+]
+
+{ #category : #accessing }
+TriasLocation >> address: anObject [
+	address  := anObject
 ]
 
 { #category : #accessing }

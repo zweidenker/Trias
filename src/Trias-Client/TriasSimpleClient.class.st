@@ -280,50 +280,10 @@ TriasSimpleClient >> getLocations: aLocationPatternString [
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getLocationsFromArea2: aPolygon [
+TriasSimpleClient >> getLocationsFromArea: aPolygon [
 
 	| response triasDocument trias |
 	response := self execute: self templateStopFromAreaRequest with: (self defaultRequestParameters at: 'Points' put: (aPolygon coordinates collect: [ :eachPoint | { 'longitude' -> eachPoint x. 'latitude' -> eachPoint y } asDictionary ]) ; yourself).
-	triasDocument := XMLDOMParser parse: response.
-	trias := TriasNodeVisitor new
-		visitDocument: triasDocument.
-	self halt.
-	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
-]
-
-{ #category : #requesting }
-TriasSimpleClient >> getLocationsFromArea: aPolygon [
-
-	| response triasDocument trias mainSchemaFile schemas req area xml xmlString result |
-	
-	mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
-	schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
-	req := (schemas findElementNamed: #Trias) newValue.
-	req beSelfExpanding.
-	req ServiceRequest RequestorRef: '3gG1pcgy89RB'.
-	area := req ServiceRequest RequestPayload LocationInformationRequest InitialInput GeoRestriction Area. 
-	result := OrderedCollection new.
-	aPolygon coordinates do: [:each |
-
-		result add: (area PolylinePoint Longitude: each x; Latitude: each y; yourself).
-		 ].
-	
-	req ServiceRequest RequestPayload LocationInformationRequest Restrictions IncludePtModes: 'true'.
-	xml := PluggableXMLVisitor new
-	visit: req name: 'Trias';
-	document.
-	
-xml 
-	version: '1.1';
-	encoding: 'utf-8'.
-xml root attributeAt: 'version' put: '1.1'.
-
-xmlString := String streamContents: [ :stream | | writer |
-	writer := (XMLWriter on: stream)
-		enablePrologPrettyPrinting.
-	xml writeXMLOn: writer ].
-	self halt.
-	response := self execute: xmlString with: Dictionary new.
 	triasDocument := XMLDOMParser parse: response.
 	trias := TriasNodeVisitor new
 		visitDocument: triasDocument.
@@ -338,7 +298,6 @@ TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude r
 	triasDocument := XMLDOMParser parse: response.
 	trias := TriasNodeVisitor new
 		visitDocument: triasDocument.
-	self halt.
 	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
 ]
 
