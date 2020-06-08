@@ -119,6 +119,32 @@ TriasEventResult >> stopPointRef: aString [
 
 { #category : #accessing }
 TriasEventResult >> transportationMode [
+	"<xs:simpleType name=""PtModesEnumeration"">
+		<xs:annotation>
+			<xs:documentation>Allowed values for MODES: TPEG pti_table 01.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base=""xs:NMTOKEN"">
+			<xs:enumeration value=""all""/>
+			<xs:enumeration value=""unknown""/>
+			<xs:enumeration value=""air""/>
+			<xs:enumeration value=""bus""/>
+			<xs:enumeration value=""trolleyBus""/>
+			<xs:enumeration value=""tram""/>
+			<xs:enumeration value=""coach""/>
+			<xs:enumeration value=""rail""/>
+			<xs:enumeration value=""intercityRail""/>
+			<xs:enumeration value=""urbanRail""/>
+			<xs:enumeration value=""metro""/>
+			<xs:enumeration value=""water""/>
+			<xs:enumeration value=""cableway""/>
+			<xs:enumeration value=""funicular""/>
+			<xs:enumeration value=""taxi""/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	see https://github.com/VDVde/TRIAS/blob/master/Trias_ModesSupport.xsd
+	
+	"
 
 	^ transportationMode
 ]
