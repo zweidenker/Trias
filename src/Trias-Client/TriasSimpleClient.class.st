@@ -84,9 +84,21 @@ TriasSimpleClient class >> parameterHookFor: aParameterName [
 ]
 
 { #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterLatitude [
+
+	^ #latitude
+]
+
+{ #category : #'accessing - request parameters' }
 TriasSimpleClient class >> parameterLocationName [
 
 	^ #locationName
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterLongitude [
+
+	^ #longitude
 ]
 
 { #category : #'accessing - request parameters' }
@@ -139,6 +151,34 @@ TriasSimpleClient class >> scriptGenerateEventRequestTemplate [
 			| writer |
 			writer := (XMLWriter on: stream) enablePrologPrettyPrinting.
 			xml writeXMLOn: writer ]
+]
+
+{ #category : #accessing }
+TriasSimpleClient class >> scriptGenerateStopFromAreaRequestTemplate [
+
+| response triasDocument trias mainSchemaFile schemas req area xml xmlString result aPolygon polyline |
+	
+	mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
+	schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+	req := (schemas findElementNamed: #Trias) newValue.
+	req beSelfExpanding.
+	req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
+	area := req ServiceRequest RequestPayload LocationInformationRequest InitialInput GeoRestriction Area PolylinePoint Longitude: (self parameterHookFor: self parameterLongitude); Latitude: (self parameterHookFor: self parameterLatitude); yourself. 
+	
+	req ServiceRequest RequestPayload LocationInformationRequest Restrictions IncludePtModes: 'true'.
+	xml := PluggableXMLVisitor new
+	visit: req name: 'Trias';
+	document.
+	
+xml 
+	version: '1.1';
+	encoding: 'utf-8'.
+xml root attributeAt: 'version' put: '1.1'.
+
+xmlString := String streamContents: [ :stream | | writer |
+	writer := (XMLWriter on: stream)
+		enablePrologPrettyPrinting.
+	xml writeXMLOn: writer ].
 ]
 
 { #category : #accessing }
@@ -239,6 +279,69 @@ TriasSimpleClient >> getLocations: aLocationPatternString [
 	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
 ]
 
+{ #category : #requesting }
+TriasSimpleClient >> getLocationsFromArea2: aPolygon [
+
+	| response triasDocument trias |
+	response := self execute: self templateStopFromAreaRequest with: (self defaultRequestParameters at: 'Points' put: (aPolygon coordinates collect: [ :eachPoint | { 'longitude' -> eachPoint x. 'latitude' -> eachPoint y } asDictionary ]) ; yourself).
+	triasDocument := XMLDOMParser parse: response.
+	trias := TriasNodeVisitor new
+		visitDocument: triasDocument.
+	self halt.
+	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getLocationsFromArea: aPolygon [
+
+	| response triasDocument trias mainSchemaFile schemas req area xml xmlString result |
+	
+	mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
+	schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+	req := (schemas findElementNamed: #Trias) newValue.
+	req beSelfExpanding.
+	req ServiceRequest RequestorRef: '3gG1pcgy89RB'.
+	area := req ServiceRequest RequestPayload LocationInformationRequest InitialInput GeoRestriction Area. 
+	result := OrderedCollection new.
+	aPolygon coordinates do: [:each |
+
+		result add: (area PolylinePoint Longitude: each x; Latitude: each y; yourself).
+		 ].
+	
+	req ServiceRequest RequestPayload LocationInformationRequest Restrictions IncludePtModes: 'true'.
+	xml := PluggableXMLVisitor new
+	visit: req name: 'Trias';
+	document.
+	
+xml 
+	version: '1.1';
+	encoding: 'utf-8'.
+xml root attributeAt: 'version' put: '1.1'.
+
+xmlString := String streamContents: [ :stream | | writer |
+	writer := (XMLWriter on: stream)
+		enablePrologPrettyPrinting.
+	xml writeXMLOn: writer ].
+	self halt.
+	response := self execute: xmlString with: Dictionary new.
+	triasDocument := XMLDOMParser parse: response.
+	trias := TriasNodeVisitor new
+		visitDocument: triasDocument.
+	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude radius: aRadiusInMeter [
+
+	| response triasDocument trias |
+	response := self execute: self templateStopFromCircleRequest with: (self defaultRequestParameters at: 'longitude' put: aLongitude ; at: 'latitude' put: aLatitude; at: 'radius' put: aRadiusInMeter; at: 'locationName' put: 'Karlsruhe';yourself).
+	triasDocument := XMLDOMParser parse: response.
+	trias := TriasNodeVisitor new
+		visitDocument: triasDocument.
+	self halt.
+	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
+]
+
 { #category : #'as yet unclassified' }
 TriasSimpleClient >> locationRequestString [
 	^ '<?xml version="1.0" encoding="UTF-8"?>
@@ -333,6 +436,22 @@ TriasSimpleClient >> templateEventsRequest [
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
 <Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><StopEventRequest><Location><LocationRef><StopPointRef>{{eventsLocationId}}</StopPointRef></LocationRef><DepArrTime>{{eventsStartTimestamp}}</DepArrTime></Location><Params><NumberOfResults>{{eventsNumberOfResults}}</NumberOfResults><TimeWindow>{{eventsTimeWindow}}</TimeWindow><StopEventType>{{eventsType}}</StopEventType></Params></StopEventRequest></RequestPayload></ServiceRequest></Trias>'
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateStopFromAreaRequest [
+"self scriptGenerateStopRequestTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><LocationInformationRequest><InitialInput><GeoRestriction><Area>{{#Points}}<PolylinePoint><Longitude>{{longitude}}</Longitude><Latitude>{{latitude}}</Latitude></PolylinePoint>{{/Points}}</Area></GeoRestriction></InitialInput><Restrictions><IncludePtModes>true</IncludePtModes></Restrictions></LocationInformationRequest></RequestPayload></ServiceRequest></Trias>'
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateStopFromCircleRequest [
+"self scriptGenerateStopCircleTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><LocationInformationRequest><InitialInput><LocationName>{{locationName}}</LocationName><GeoRestriction><Circle><Center><Longitude>{{longitude}}</Longitude><Latitude>{{latitude}}</Latitude></Center><Radius>{{radius}}</Radius></Circle></GeoRestriction></InitialInput><Restrictions><IncludePtModes>true</IncludePtModes></Restrictions></LocationInformationRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #'private - templates' }
