@@ -96,6 +96,12 @@ TriasSimpleClient class >> parameterLocationName [
 ]
 
 { #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterLocationRef [
+
+	^ #locationRef
+]
+
+{ #category : #'accessing - request parameters' }
 TriasSimpleClient class >> parameterLongitude [
 
 	^ #longitude
@@ -179,6 +185,34 @@ xmlString := String streamContents: [ :stream | | writer |
 	writer := (XMLWriter on: stream)
 		enablePrologPrettyPrinting.
 	xml writeXMLOn: writer ].
+]
+
+{ #category : #accessing }
+TriasSimpleClient class >> scriptGenerateStopRefinementRequestTemplate [
+
+		| mainSchemaFile schemas req xml xmlString |
+	mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
+schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+		
+req := (schemas findElementNamed: #Trias) newValue.
+req beSelfExpanding.
+req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
+req ServiceRequest RequestPayload LocationInformationRequest LocationRef StopPointRef: (self parameterHookFor: self parameterLocationRef).
+xml := PluggableXMLVisitor new
+	visit: req name: 'Trias';
+	document.
+	
+xml 
+	version: '1.1';
+	encoding: 'utf-8'.
+xml root attributeAt: 'version' put: '1.1'.
+
+xmlString := String streamContents: [ :stream | | writer |
+	writer := (XMLWriter on: stream)
+		enablePrologPrettyPrinting.
+	xml writeXMLOn: writer ].
+
+^ xmlString
 ]
 
 { #category : #accessing }
@@ -266,6 +300,17 @@ TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDur
 	^ (responseElement allElementsNamed: 'StopEventResult') collect: [:eachXMLElement | 
 		TriasEventResult fromXML: eachXMLElement
 		].
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getLocationRefinement: aLocationId [
+
+	| response triasDocument trias |
+	response := self execute: self templateRefinementStopRequest  with: (self defaultRequestParameters at: self class parameterLocationRef  put: aLocationId ; yourself).
+	triasDocument := XMLDOMParser parse: response.
+	trias := TriasNodeVisitor new
+		visitDocument: triasDocument.
+	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults first "there should be only one result for a refinement request"
 ]
 
 { #category : #requesting }
@@ -395,6 +440,14 @@ TriasSimpleClient >> templateEventsRequest [
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
 <Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><StopEventRequest><Location><LocationRef><StopPointRef>{{eventsLocationId}}</StopPointRef></LocationRef><DepArrTime>{{eventsStartTimestamp}}</DepArrTime></Location><Params><NumberOfResults>{{eventsNumberOfResults}}</NumberOfResults><TimeWindow>{{eventsTimeWindow}}</TimeWindow><StopEventType>{{eventsType}}</StopEventType></Params></StopEventRequest></RequestPayload></ServiceRequest></Trias>'
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateRefinementStopRequest [
+"self scriptGenerateStopRefinementRequestTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><LocationInformationRequest><LocationRef><StopPointRef>{{locationRef}}</StopPointRef></LocationRef></LocationInformationRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #'private - templates' }
