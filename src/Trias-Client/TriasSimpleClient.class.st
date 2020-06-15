@@ -391,14 +391,14 @@ TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude r
 { #category : #requesting }
 TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
 
-	| response triasDocument trias |
+	| response triasDocument trias responseElement |
 	response := self execute: self templateTripRequest with: (self defaultRequestParameters at: self class parameterOriginRef  put: anOriginStopPointRef ;
 	at: self class parameterDestinationRef  put: aDestinationStopPointRef ;
 	 yourself).
 	triasDocument := XMLDOMParser parse: response.
-	trias := TriasNodeVisitor new
-		visitDocument: triasDocument.
-	^ triasDocument
+	responseElement := (triasDocument findElementNamed: 'TripResponse').
+	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
+	^ (responseElement allElementsNamed: 'TripResult') 
 ]
 
 { #category : #'as yet unclassified' }
