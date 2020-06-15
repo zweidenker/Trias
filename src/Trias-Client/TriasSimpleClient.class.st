@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'url',
-		'timeout'
+		'timeout',
+		'timeoutRetries'
 	],
 	#classInstVars : [
 		'requestorRef'
@@ -312,13 +313,28 @@ TriasSimpleClient >> defaultRequestParameters [
 { #category : #requesting }
 TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters [
 
+	^ self execute: aRequestTemplateString with: mustacheParameters attempt: 1
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters attempt: aNumber [
 	| client response |
-	client := ZnClient new 
+	client := ZnClient new
 		timeout: self timeout;
 		url: self url;
-		entity: (ZnEntity xml: (self process: aRequestTemplateString with: mustacheParameters)).
-	response := client post.
-	^response
+		entity:
+			(ZnEntity
+				xml: (self process: aRequestTemplateString with: mustacheParameters)).
+	response := [ client post ]
+		on: ConnectionTimedOut
+		do: [ :ex | 
+			 (aNumber > self timeoutRetries)
+				ifTrue: [ ex pass ]
+				ifFalse: [ ^ self
+						execute: aRequestTemplateString
+						with: mustacheParameters
+						attempt: aNumber + 1 ] ].
+	^ response
 ]
 
 { #category : #requesting }
@@ -547,6 +563,19 @@ TriasSimpleClient >> timeout [
 TriasSimpleClient >> timeout: aNumberOfSeconds [
 
 	timeout := aNumberOfSeconds
+]
+
+{ #category : #accessing }
+TriasSimpleClient >> timeoutRetries [
+	"sometimes it might help to retry a request after getting a timeout.
+	By default do not attempt any retry"
+	^ timeoutRetries ifNil: [ 0 ]
+]
+
+{ #category : #accessing }
+TriasSimpleClient >> timeoutRetries: aNumber [
+
+	timeoutRetries := aNumber
 ]
 
 { #category : #'as yet unclassified' }
