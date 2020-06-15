@@ -48,6 +48,12 @@ TriasSimpleClient class >> eventTypeDeparture [
 ]
 
 { #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterDestinationRef [
+
+	^ #destinationRef
+]
+
+{ #category : #'accessing - request parameters' }
 TriasSimpleClient class >> parameterEventsLocationId [
 
 	^ #eventsLocationId
@@ -105,6 +111,12 @@ TriasSimpleClient class >> parameterLocationRef [
 TriasSimpleClient class >> parameterLongitude [
 
 	^ #longitude
+]
+
+{ #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterOriginRef [
+
+	^ #originRef
 ]
 
 { #category : #'accessing - request parameters' }
@@ -244,6 +256,36 @@ xmlString := String streamContents: [ :stream | | writer |
 ^ xmlString
 ]
 
+{ #category : #accessing }
+TriasSimpleClient class >> scriptGenerateTripRequestTemplate [
+
+| mainSchemaFile schemas req xml xmlString xmString |
+mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
+schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+		
+req := (schemas findElementNamed: #Trias) newValue.
+req beSelfExpanding.
+req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
+req ServiceRequest RequestPayload TripRequest Origin LocationRef StopPointRef: (self parameterHookFor: self parameterOriginRef).
+req ServiceRequest RequestPayload TripRequest Destination LocationRef StopPointRef: (self parameterHookFor: self parameterDestinationRef).
+xml := PluggableXMLVisitor new
+	visit: req name: 'Trias';
+	document.
+	
+xml 
+	version: '1.1';
+	encoding: 'utf-8'.
+xml root attributeAt: 'version' put: '1.1'.
+
+^ String streamContents: [ :stream | | writer |
+	writer := (XMLWriter on: stream)
+		enablePrologPrettyPrinting.
+	xml writeXMLOn: writer ].
+
+
+
+]
+
 { #category : #'as yet unclassified' }
 TriasSimpleClient >> dataRequestString [
 	^ '<?xml version="1.0" encoding="UTF-8"?>
@@ -344,6 +386,19 @@ TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude r
 	trias := TriasNodeVisitor new
 		visitDocument: triasDocument.
 	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
+
+	| response triasDocument trias responseElement |
+	response := self execute: self templateTripRequest with: (self defaultRequestParameters at: self class parameterOriginRef  put: anOriginStopPointRef ;
+	at: self class parameterDestinationRef  put: aDestinationStopPointRef ;
+	 yourself).
+	triasDocument := XMLDOMParser parse: response.
+	responseElement := (triasDocument findElementNamed: 'TripResponse').
+	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
+	^ (responseElement allElementsNamed: 'TripResult') 
 ]
 
 { #category : #'as yet unclassified' }
@@ -472,6 +527,14 @@ TriasSimpleClient >> templateStopRequest [
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
 <Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><LocationInformationRequest><InitialInput><LocationName>{{locationName}}</LocationName></InitialInput><Restrictions><IncludePtModes>true</IncludePtModes></Restrictions></LocationInformationRequest></RequestPayload></ServiceRequest></Trias>'
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateTripRequest [
+"self scriptGenerateTripRequestTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><TripRequest><Origin><LocationRef><StopPointRef>{{originRef}}</StopPointRef></LocationRef></Origin><Destination><LocationRef><StopPointRef>{{destinationRef}}</StopPointRef></LocationRef></Destination></TripRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #accessing }
