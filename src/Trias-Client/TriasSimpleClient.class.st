@@ -421,7 +421,9 @@ TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPoint
 	triasDocument := XMLDOMParser parse: response.
 	responseElement := (triasDocument findElementNamed: 'TripResponse').
 	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
-	^ (responseElement allElementsNamed: 'TripResult') 
+	^ (responseElement allElementsNamed: 'TripResult') collect: [:eachXMLElement | 
+		TriasTripResult fromXML: eachXMLElement
+		].
 ]
 
 { #category : #'as yet unclassified' }
