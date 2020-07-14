@@ -34,7 +34,8 @@ BaselineOfTrias >> mustache: spec [
 	spec
 		baseline: 'Mustache' with: [ 
 			spec 
-				repository: 'github://noha/mustache:v1.0.1/repository'].
+				repository: 'github://noha/mustache:v1.0.1/repository';
+				loads: #( 'Core' )].
 			
 	
 ]
