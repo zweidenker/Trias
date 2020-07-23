@@ -31,16 +31,16 @@ TriasEventResult class >> xmlElementName [
 TriasEventResult >> initializeFromXML: anXMLElement [
 
 
-	self resultId: (anXMLElement findElementNamed: 'ResultId') contentString.
-	self stopPointRef: (anXMLElement findElementNamed: 'StopPointRef') contentString.
-	self stopPointName: ((anXMLElement findElementNamed: 'StopPointName') elementAt: 'Text') contentString.
-	self serviceDeparture: (DateAndTime fromString: ((anXMLElement findElementNamed: 'ServiceDeparture') elementAt: 'TimetabledTime') contentString).
-	self operatingDayRef:  (Date fromString: (anXMLElement findElementNamed: 'OperatingDayRef') contentString).
-	self lineRef:  (anXMLElement findElementNamed: 'LineRef') contentString.
-	self transportationMode:  (anXMLElement findElementNamed: 'PtMode') contentString.
-	(anXMLElement findElementNamed: 'RailSubmode') ifNotNil: [ :anElement | self transportationSubMode: anElement contentString ].
-	(anXMLElement findElementNamed: 'BusSubmode') ifNotNil: [ :anElement | self transportationSubMode: anElement contentString ].
-	(anXMLElement findElementNamed: 'TramSubmode') ifNotNil: [ :anElement | self transportationSubMode: anElement contentString ].
+	self resultId: (self extractValueFrom: anXMLElement element: 'ResultId').
+	self stopPointRef: (self extractValueFrom: anXMLElement element: 'StopPointRef').
+	self stopPointName: (self extractValueFrom:(anXMLElement findElementNamed: 'StopPointName') element: 'Text').
+	self serviceDeparture: (self extractValueFrom: (anXMLElement findElementNamed: 'ServiceDeparture') element: 'TimetabledTime' convert: [:string | DateAndTime fromString: string ]).
+	self operatingDayRef:  (self extractValueFrom: anXMLElement element: 'OperatingDayRef' convert: [:string | Date fromString: string]).
+	self lineRef:  (self extractValueFrom: anXMLElement element: 'LineRef').
+	self transportationMode:  (self extractValueFrom: anXMLElement element: 'PtMode').
+	(self extractOptionalValueFrom: anXMLElement element: 'RailSubmode') ifNotNil: [ :aString | self transportationSubMode: aString ].
+	(self extractOptionalValueFrom: anXMLElement element: 'BusSubmode') ifNotNil: [ :aString | self transportationSubMode: aString ].
+	(self extractOptionalValueFrom: anXMLElement element: 'TramSubmode') ifNotNil: [ :aString | self transportationSubMode: aString ].
 	
 	
 ]

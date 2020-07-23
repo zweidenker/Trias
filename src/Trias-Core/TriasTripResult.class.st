@@ -39,16 +39,22 @@ TriasTripResult >> distance: aNumber [
 
 { #category : #initialization }
 TriasTripResult >> initializeFromXML: anXMLElement [
-
-
-	self resultId: (anXMLElement findElementNamed: 'ResultId') contentString.
-	self distance: (anXMLElement findElementNamed: 'Distance') contentString.
-	self interchanges: ((anXMLElement findElementNamed: 'Interchanges') ) contentString asNumber.
-	self projection: ((anXMLElement findElementNamed: 'Projection') elements collect: [ :each |
-		(each findElementNamed: 'Longitude') contentString asNumber @ (each findElementNamed: 'Latitude') contentString asNumber
-		 ]).
-	
-	
+	self
+		resultId: (self extractValueFrom: anXMLElement element: 'ResultId').
+	self
+		distance: (self extractValueFrom: anXMLElement element: 'Distance').
+	self
+		interchanges:
+			(self
+				extractValueFrom: anXMLElement
+				element: 'Interchanges'
+				convert: #asNumber).
+	self
+		projection:
+			((anXMLElement findElementNamed: 'Projection') elements
+				collect: [ :each | 
+					(self extractValueFrom: each element: 'Longitude' convert: #asNumber)
+						@ (self extractValueFrom: each element: 'Latitude' convert: #asNumber) ])
 ]
 
 { #category : #accessing }

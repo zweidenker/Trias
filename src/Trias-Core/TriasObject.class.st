@@ -20,6 +20,41 @@ TriasObject class >> xmlElementName [
 	self subclassResponsibility 
 ]
 
+{ #category : #utilities }
+TriasObject >> extractOptionalValueFrom: anXMLElement element: elementName [ 
+
+	^ self extractOptionalValueFrom: anXMLElement element: elementName convert: #yourself
+]
+
+{ #category : #utilities }
+TriasObject >> extractOptionalValueFrom: anXMLElement element: elementName convert: converter [
+	^  self extractValueFrom: anXMLElement element: elementName convert: converter ifAbsent: [ nil ]
+]
+
+{ #category : #utilities }
+TriasObject >> extractValueFrom: anXMLElement element: elementName [ 
+
+	^ self extractValueFrom: anXMLElement element: elementName convert: #yourself
+]
+
+{ #category : #utilities }
+TriasObject >> extractValueFrom: anXMLElement element: elementName convert: converter [
+	^  self extractValueFrom: anXMLElement element: elementName convert: converter ifAbsent: [ Error signal: ('Element ' , elementName printString , ' not found in ' , anXMLElement printString) ]
+]
+
+{ #category : #utilities }
+TriasObject >> extractValueFrom: anXMLElement element: elementName convert: converter ifAbsent: aBlock [
+	^ (anXMLElement findElementNamed: elementName)
+		ifNil: [ aBlock value ]
+		ifNotNil: [ :element | converter value: element contentString ]
+]
+
+{ #category : #utilities }
+TriasObject >> extractValueFrom: anXMLElement element: elementName ifAbsent: aBlock [
+
+	^ self extractValueFrom: anXMLElement element: elementName convert: #yourself ifAbsent: aBlock
+]
+
 { #category : #translating }
 TriasObject >> translateName: aString [ 
 	^ aString

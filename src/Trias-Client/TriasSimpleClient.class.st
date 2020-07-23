@@ -362,7 +362,7 @@ TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDur
 	
 	responseElement := (triasDocument findElementNamed: 'StopEventResponse').
 	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
-	^ (responseElement allElementsNamed: 'StopEventResult') collect: [:eachXMLElement | 
+	^ (responseElement allElementsNamed: 'StopEventResult') asOrderedCollection collect: [:eachXMLElement | 
 		TriasEventResult fromXML: eachXMLElement
 		].
 ]
@@ -421,7 +421,7 @@ TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPoint
 	triasDocument := XMLDOMParser parse: response.
 	responseElement := (triasDocument findElementNamed: 'TripResponse').
 	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
-	^ (responseElement allElementsNamed: 'TripResult') collect: [:eachXMLElement | 
+	^ (responseElement allElementsNamed: 'TripResult') asOrderedCollection collect: [:eachXMLElement | 
 		TriasTripResult fromXML: eachXMLElement
 		].
 ]
