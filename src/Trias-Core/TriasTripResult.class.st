@@ -42,7 +42,7 @@ TriasTripResult >> initializeFromXML: anXMLElement [
 	self
 		resultId: (self extractValueFrom: anXMLElement element: 'ResultId').
 	self
-		distance: (self extractValueFrom: anXMLElement element: 'Distance').
+		distance: (self extractOptionalValueFrom: anXMLElement element: 'Distance').
 	self
 		interchanges:
 			(self
