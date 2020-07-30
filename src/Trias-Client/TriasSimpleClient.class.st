@@ -121,6 +121,12 @@ TriasSimpleClient class >> parameterOriginRef [
 ]
 
 { #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterRequestTimestamp [
+
+	^ #requestTimestamp
+]
+
+{ #category : #'accessing - request parameters' }
 TriasSimpleClient class >> parameterRequestorRef [
 
 	^ #requestorRef
@@ -267,7 +273,10 @@ schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
 req := (schemas findElementNamed: #Trias) newValue.
 req beSelfExpanding.
 req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
+
+
 req ServiceRequest RequestPayload TripRequest Origin LocationRef StopPointRef: (self parameterHookFor: self parameterOriginRef).
+req ServiceRequest RequestPayload TripRequest Origin DepArrTime: (self parameterHookFor: self parameterRequestTimestamp ).
 req ServiceRequest RequestPayload TripRequest Destination LocationRef StopPointRef: (self parameterHookFor: self parameterDestinationRef).
 "
 			<xs:enumeration value=""all""/>
@@ -435,9 +444,16 @@ TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude r
 { #category : #requesting }
 TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
 
+	^ self getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: DateAndTime now
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
+
 	| response triasDocument trias responseElement |
 	response := self execute: self templateTripRequest with: (self defaultRequestParameters at: self class parameterOriginRef  put: anOriginStopPointRef ;
 	at: self class parameterDestinationRef  put: aDestinationStopPointRef ;
+	at: self class parameterRequestTimestamp put: aDateAndTime printString ;
 	 yourself).
 	triasDocument := XMLDOMParser parse: response.
 
@@ -581,7 +597,7 @@ TriasSimpleClient >> templateTripRequest [
 "self scriptGenerateTripRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
-<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><TripRequest><Origin><LocationRef><StopPointRef>{{originRef}}</StopPointRef></LocationRef></Origin><Destination><LocationRef><StopPointRef>{{destinationRef}}</StopPointRef></LocationRef></Destination><Params><InterchangeLimit>0</InterchangeLimit><AlgorithmType>minChanges</AlgorithmType><IncludeTrackSections>true</IncludeTrackSections><IncludeLegProjection>true</IncludeLegProjection><IncludeIntermediateStops>false</IncludeIntermediateStops><IncludeOperatingDays>false</IncludeOperatingDays><IncludeFares>true</IncludeFares></Params></TripRequest></RequestPayload></ServiceRequest></Trias>'
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><TripRequest><Origin><LocationRef><StopPointRef>{{originRef}}</StopPointRef></LocationRef><DepArrTime>{{requestTimestamp}}</DepArrTime></Origin><Destination><LocationRef><StopPointRef>{{destinationRef}}</StopPointRef></LocationRef></Destination><Params><InterchangeLimit>0</InterchangeLimit><AlgorithmType>minChanges</AlgorithmType><IncludeTrackSections>true</IncludeTrackSections><IncludeLegProjection>true</IncludeLegProjection><IncludeIntermediateStops>false</IncludeIntermediateStops><IncludeOperatingDays>false</IncludeOperatingDays><IncludeFares>true</IncludeFares></Params></TripRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #accessing }
