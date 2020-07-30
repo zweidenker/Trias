@@ -3,9 +3,9 @@ Class {
 	#superclass : #TriasObject,
 	#instVars : [
 		'resultId',
-		'projection',
 		'interchanges',
-		'distance'
+		'distance',
+		'legs'
 	],
 	#category : #'Trias-Core-Model'
 }
@@ -49,12 +49,10 @@ TriasTripResult >> initializeFromXML: anXMLElement [
 				extractValueFrom: anXMLElement
 				element: 'Interchanges'
 				convert: #asNumber).
-	self
-		projection:
-			((anXMLElement findElementNamed: 'Projection') elements
-				collect: [ :each | 
-					(self extractValueFrom: each element: 'Longitude' convert: #asNumber)
-						@ (self extractValueFrom: each element: 'Latitude' convert: #asNumber) ])
+	self legs: ((anXMLElement allElementsNamed: 'TripLeg') asOrderedCollection collect: [:eachLegElement |
+		TriasTripLeg new initializeFromXML: eachLegElement
+		]).
+	
 ]
 
 { #category : #accessing }
@@ -73,17 +71,29 @@ TriasTripResult >> interchanges: aNumber [
 ]
 
 { #category : #accessing }
-TriasTripResult >> projection [
+TriasTripResult >> isStraightLine [
 
-	^ projection
-
+	^ self legsWithProjection size = 1
 	
 ]
 
 { #category : #accessing }
-TriasTripResult >> projection: aCollectionOfPoints [
+TriasTripResult >> legs [
 
-	projection :=  aCollectionOfPoints
+	^ legs 
+	
+]
+
+{ #category : #accessing }
+TriasTripResult >> legs: aCollectionOfTripLeg [
+
+	legs := aCollectionOfTripLeg
+]
+
+{ #category : #accessing }
+TriasTripResult >> legsWithProjection [
+
+	^ self legs select: [ :each | each projection notNil ]
 	
 ]
 

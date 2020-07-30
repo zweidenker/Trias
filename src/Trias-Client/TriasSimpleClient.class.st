@@ -269,6 +269,24 @@ req beSelfExpanding.
 req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
 req ServiceRequest RequestPayload TripRequest Origin LocationRef StopPointRef: (self parameterHookFor: self parameterOriginRef).
 req ServiceRequest RequestPayload TripRequest Destination LocationRef StopPointRef: (self parameterHookFor: self parameterDestinationRef).
+"
+			<xs:enumeration value=""all""/>
+			<xs:enumeration value=""unknown""/>
+			<xs:enumeration value=""air""/>
+			<xs:enumeration value=""bus""/>
+			<xs:enumeration value=""trolleyBus""/>
+			<xs:enumeration value=""tram""/>
+			<xs:enumeration value=""coach""/>
+			<xs:enumeration value=""rail""/>
+			<xs:enumeration value=""intercityRail""/>
+			<xs:enumeration value=""urbanRail""/>
+			<xs:enumeration value=""metro""/>
+			<xs:enumeration value=""water""/>
+			<xs:enumeration value=""cableway""/>
+			<xs:enumeration value=""funicular""/>
+			<xs:enumeration value=""taxi""/>
+		</xs:restriction>'"
+"req ServiceRequest RequestPayload TripRequest Params PtModeFilter Exclude: true;PtMode: 'all'."
 req ServiceRequest RequestPayload TripRequest Params InterchangeLimit: '0'.
 req ServiceRequest RequestPayload TripRequest Params AlgorithmType: 'minChanges'.
 req ServiceRequest RequestPayload TripRequest Params IncludeTrackSections: true.
@@ -422,6 +440,7 @@ TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPoint
 	at: self class parameterDestinationRef  put: aDestinationStopPointRef ;
 	 yourself).
 	triasDocument := XMLDOMParser parse: response.
+
 	responseElement := (triasDocument findElementNamed: 'TripResponse').
 	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
 	^ (responseElement allElementsNamed: 'TripResult') asOrderedCollection collect: [:eachXMLElement | 
