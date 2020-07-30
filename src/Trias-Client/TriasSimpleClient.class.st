@@ -269,11 +269,14 @@ req beSelfExpanding.
 req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
 req ServiceRequest RequestPayload TripRequest Origin LocationRef StopPointRef: (self parameterHookFor: self parameterOriginRef).
 req ServiceRequest RequestPayload TripRequest Destination LocationRef StopPointRef: (self parameterHookFor: self parameterDestinationRef).
+req ServiceRequest RequestPayload TripRequest Params InterchangeLimit: '0'.
+req ServiceRequest RequestPayload TripRequest Params AlgorithmType: 'minChanges'.
 req ServiceRequest RequestPayload TripRequest Params IncludeTrackSections: true.
 req ServiceRequest RequestPayload TripRequest Params IncludeLegProjection: true.
 req ServiceRequest RequestPayload TripRequest Params IncludeIntermediateStops: false.
 req ServiceRequest RequestPayload TripRequest Params IncludeOperatingDays: false.
 req ServiceRequest RequestPayload TripRequest Params IncludeFares: true.
+
 
 
 xml := PluggableXMLVisitor new
@@ -559,7 +562,7 @@ TriasSimpleClient >> templateTripRequest [
 "self scriptGenerateTripRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
-<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><TripRequest><Origin><LocationRef><StopPointRef>{{originRef}}</StopPointRef></LocationRef></Origin><Destination><LocationRef><StopPointRef>{{destinationRef}}</StopPointRef></LocationRef></Destination><Params><IncludeTrackSections>true</IncludeTrackSections><IncludeLegProjection>true</IncludeLegProjection><IncludeIntermediateStops>false</IncludeIntermediateStops><IncludeOperatingDays>false</IncludeOperatingDays><IncludeFares>true</IncludeFares></Params></TripRequest></RequestPayload></ServiceRequest></Trias>'
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><TripRequest><Origin><LocationRef><StopPointRef>{{originRef}}</StopPointRef></LocationRef></Origin><Destination><LocationRef><StopPointRef>{{destinationRef}}</StopPointRef></LocationRef></Destination><Params><InterchangeLimit>0</InterchangeLimit><AlgorithmType>minChanges</AlgorithmType><IncludeTrackSections>true</IncludeTrackSections><IncludeLegProjection>true</IncludeLegProjection><IncludeIntermediateStops>false</IncludeIntermediateStops><IncludeOperatingDays>false</IncludeOperatingDays><IncludeFares>true</IncludeFares></Params></TripRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #accessing }
