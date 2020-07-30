@@ -5,7 +5,9 @@ Class {
 		'resultId',
 		'projection',
 		'interchanges',
-		'distance'
+		'distance',
+		'transportationMode',
+		'lineName'
 	],
 	#category : #'Trias-Core-Model'
 }
@@ -54,7 +56,18 @@ TriasTripResult >> initializeFromXML: anXMLElement [
 			((anXMLElement findElementNamed: 'Projection') elements
 				collect: [ :each | 
 					(self extractValueFrom: each element: 'Longitude' convert: #asNumber)
-						@ (self extractValueFrom: each element: 'Latitude' convert: #asNumber) ])
+						@ (self extractValueFrom: each element: 'Latitude' convert: #asNumber) ]).
+					
+	self
+		transportationMode: (self
+				extractOptionalValueFrom: anXMLElement
+				element: 'PtMode').
+	(anXMLElement findElementNamed: 'PublishedLineName') ifNotNil: [:aXMLElement |
+		self lineName: (self
+				extractOptionalValueFrom: aXMLElement
+				element: 'Text').
+		].
+	
 ]
 
 { #category : #accessing }
@@ -69,6 +82,20 @@ TriasTripResult >> interchanges [
 TriasTripResult >> interchanges: aNumber [
 
 	interchanges := aNumber
+	
+]
+
+{ #category : #accessing }
+TriasTripResult >> lineName [
+
+	^ lineName 
+]
+
+{ #category : #accessing }
+TriasTripResult >> lineName: aString [
+
+	lineName := aString
+
 	
 ]
 
@@ -97,4 +124,20 @@ TriasTripResult >> resultId [
 TriasTripResult >> resultId: aString [
 
 	resultId := aString
+]
+
+{ #category : #accessing }
+TriasTripResult >> transportationMode [
+
+	^ transportationMode
+
+	
+]
+
+{ #category : #accessing }
+TriasTripResult >> transportationMode: aString [
+
+	transportationMode := aString
+
+	
 ]
