@@ -152,6 +152,65 @@ TriasSimpleClient class >> scriptEventResponseXSD [
 ]
 
 { #category : #accessing }
+TriasSimpleClient class >> scriptGenerateBusTripRequestTemplate [
+
+| mainSchemaFile schemas req xml xmlString xmString |
+mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
+schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
+		
+req := (schemas findElementNamed: #Trias) newValue.
+req beSelfExpanding.
+req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
+req ServiceRequest RequestPayload TripRequest Origin LocationRef StopPointRef: (self parameterHookFor: self parameterOriginRef).
+req ServiceRequest RequestPayload TripRequest Origin DepArrTime: (self parameterHookFor: self parameterRequestTimestamp ).
+req ServiceRequest RequestPayload TripRequest Destination LocationRef StopPointRef: (self parameterHookFor: self parameterDestinationRef).
+"
+			<xs:enumeration value=""all""/>
+			<xs:enumeration value=""unknown""/>
+			<xs:enumeration value=""air""/>
+			<xs:enumeration value=""bus""/>
+			<xs:enumeration value=""trolleyBus""/>
+			<xs:enumeration value=""tram""/>
+			<xs:enumeration value=""coach""/>
+			<xs:enumeration value=""rail""/>
+			<xs:enumeration value=""intercityRail""/>
+			<xs:enumeration value=""urbanRail""/>
+			<xs:enumeration value=""metro""/>
+			<xs:enumeration value=""water""/>
+			<xs:enumeration value=""cableway""/>
+			<xs:enumeration value=""funicular""/>
+			<xs:enumeration value=""taxi""/>
+		</xs:restriction>'"
+req ServiceRequest RequestPayload TripRequest Params PtModeFilter Exclude: false ;PtMode: 'bus' ; BusSubmode: 'regionalBus' ; BusSubmode: 'localBus' ; BusSubmode: 'demandAndResponseBus' .
+req ServiceRequest RequestPayload TripRequest Params InterchangeLimit: '0'.
+req ServiceRequest RequestPayload TripRequest Params AlgorithmType: 'minChanges'.
+req ServiceRequest RequestPayload TripRequest Params IncludeTrackSections: true.
+req ServiceRequest RequestPayload TripRequest Params IncludeLegProjection: true.
+req ServiceRequest RequestPayload TripRequest Params IncludeIntermediateStops: false.
+req ServiceRequest RequestPayload TripRequest Params IncludeOperatingDays: false.
+req ServiceRequest RequestPayload TripRequest Params IncludeFares: true.
+
+
+
+xml := PluggableXMLVisitor new
+	visit: req name: 'Trias';
+	document.
+	
+xml 
+	version: '1.1';
+	encoding: 'utf-8'.
+xml root attributeAt: 'version' put: '1.1'.
+
+^ String streamContents: [ :stream | | writer |
+	writer := (XMLWriter on: stream)
+		enablePrologPrettyPrinting.
+	xml writeXMLOn: writer ].
+
+
+
+]
+
+{ #category : #accessing }
 TriasSimpleClient class >> scriptGenerateEventRequestTemplate [
 	| mainSchemaFile schemas req xml xmlString |
 	mainSchemaFile := '../trias/Trias.xsd' asFileReference.
@@ -273,8 +332,6 @@ schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
 req := (schemas findElementNamed: #Trias) newValue.
 req beSelfExpanding.
 req ServiceRequest RequestorRef: (self parameterHookFor: self parameterRequestorRef).
-
-
 req ServiceRequest RequestPayload TripRequest Origin LocationRef StopPointRef: (self parameterHookFor: self parameterOriginRef).
 req ServiceRequest RequestPayload TripRequest Origin DepArrTime: (self parameterHookFor: self parameterRequestTimestamp ).
 req ServiceRequest RequestPayload TripRequest Destination LocationRef StopPointRef: (self parameterHookFor: self parameterDestinationRef).
@@ -375,6 +432,18 @@ TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters at
 ]
 
 { #category : #requesting }
+TriasSimpleClient >> getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
+
+	^ self getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: DateAndTime now
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
+
+	^ self getTrip: self templateBusTripRequest from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime
+]
+
+{ #category : #requesting }
 TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults [
 	| response triasDocument responseElement |
 	response := self
@@ -442,16 +511,10 @@ TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude r
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
+TriasSimpleClient >> getTrip: requestTemplate from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
 
-	^ self getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: DateAndTime now
-]
-
-{ #category : #requesting }
-TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
-
-	| response triasDocument trias responseElement |
-	response := self execute: self templateTripRequest with: (self defaultRequestParameters at: self class parameterOriginRef  put: anOriginStopPointRef ;
+	| response triasDocument responseElement |
+	response := self execute: requestTemplate with: (self defaultRequestParameters at: self class parameterOriginRef  put: anOriginStopPointRef ;
 	at: self class parameterDestinationRef  put: aDestinationStopPointRef ;
 	at: self class parameterRequestTimestamp put: aDateAndTime printString ;
 	 yourself).
@@ -462,6 +525,18 @@ TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPoint
 	^ (responseElement allElementsNamed: 'TripResult') asOrderedCollection collect: [:eachXMLElement | 
 		TriasTripResult fromXML: eachXMLElement
 		].
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
+
+	^ self getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: DateAndTime now
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
+
+	^ self getTrip: self templateTripRequest from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime
 ]
 
 { #category : #'as yet unclassified' }
@@ -550,6 +625,14 @@ TriasSimpleClient >> requestTrip [
 		entity: (ZnEntity xml: (self process: self tripRequestString)).
 	response := client post.
 	^response
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateBusTripRequest [
+"self scriptGenerateBusTripRequestTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><TripRequest><Origin><LocationRef><StopPointRef>{{originRef}}</StopPointRef></LocationRef><DepArrTime>{{requestTimestamp}}</DepArrTime></Origin><Destination><LocationRef><StopPointRef>{{destinationRef}}</StopPointRef></LocationRef></Destination><Params><PtModeFilter><Exclude>false</Exclude><PtMode>bus</PtMode><BusSubmode>regionalBus</BusSubmode><BusSubmode>localBus</BusSubmode> <BusSubmode>demandAndResponseBus</BusSubmode></PtModeFilter><InterchangeLimit>0</InterchangeLimit><AlgorithmType>minChanges</AlgorithmType><IncludeTrackSections>true</IncludeTrackSections><IncludeLegProjection>true</IncludeLegProjection><IncludeIntermediateStops>false</IncludeIntermediateStops><IncludeOperatingDays>false</IncludeOperatingDays><IncludeFares>true</IncludeFares></Params></TripRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #'private - templates' }
