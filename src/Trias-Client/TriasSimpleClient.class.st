@@ -547,10 +547,10 @@ TriasSimpleClient >> handleErrorIn: responseElement [
 		ifNotNil: [ :errorElement | 
 			(errorElement elementAt: 'Code')
 				ifNotNil: [ :codeElement | 
-					Error
-						signal:
-							'Trias responded with error ' , codeElement strings anyOne , ' : '
-								, ((errorElement elementAt: 'Text') elementAt: 'Text') strings anyOne ] ]
+					TriasRequestError new 
+						code: codeElement strings anyOne;
+						text: ((errorElement elementAt: 'Text') elementAt: 'Text') strings anyOne;
+						signal ] ]
 ]
 
 { #category : #'as yet unclassified' }
