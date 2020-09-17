@@ -451,19 +451,21 @@ TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDur
 		with:
 			(self defaultRequestParameters
 				at: self class parameterEventsLocationId put: locationId;
-				at: self class parameterEventsStartTimestamp put: aDateAndTime printString;
+				at: self class parameterEventsStartTimestamp
+					put: aDateAndTime printString;
 				at: self class parameterEventsTimeWindow put: aDurationString;
 				at: self class parameterEventsType put: eventType;
 				at: self class parameterEventsNumberOfResults
 					put: maximumNumberOfResults;
 				yourself).
 	triasDocument := XMLDOMParser parse: response.
-	
-	responseElement := (triasDocument findElementNamed: 'StopEventResponse').
-	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
-	^ (responseElement allElementsNamed: 'StopEventResult') asOrderedCollection collect: [:eachXMLElement | 
-		TriasEventResult fromXML: eachXMLElement
-		].
+	responseElement := triasDocument
+		findElementNamed: 'StopEventResponse'.
+	responseElement ifNil: [ ^ Error signal: 'Invalid Trias Request' ].
+	self handleErrorIn: responseElement.
+	^ (responseElement allElementsNamed: 'StopEventResult')
+		asOrderedCollection
+		collect: [ :eachXMLElement | TriasEventResult fromXML: eachXMLElement ]
 ]
 
 { #category : #requesting }
@@ -537,6 +539,18 @@ TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPoint
 TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
 
 	^ self getTrip: self templateTripRequest from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> handleErrorIn: responseElement [
+	(responseElement findElementNamed: 'ErrorMessage')
+		ifNotNil: [ :errorElement | 
+			(errorElement elementAt: 'Code')
+				ifNotNil: [ :codeElement | 
+					Error
+						signal:
+							'Trias responded with error ' , codeElement strings anyOne , ' : '
+								, ((errorElement elementAt: 'Text') elementAt: 'Text') strings anyOne ] ]
 ]
 
 { #category : #'as yet unclassified' }
