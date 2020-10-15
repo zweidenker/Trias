@@ -8,6 +8,19 @@ Class {
 	#category : #'Trias-Client'
 }
 
+{ #category : #accessing }
+TriasRequestError class >> errorClassForCode: aCode [
+
+	^ self subclasses detect: [ :each | each triasCode = aCode ] ifNone: [ self ]
+]
+
+{ #category : #'instance creation' }
+TriasRequestError class >> errorFromCode: aTriasCodeString [
+	^ (self errorClassForCode: aTriasCodeString) new
+		code: aTriasCodeString;
+		yourself
+]
+
 { #category : #acccessing }
 TriasRequestError >> code [ 
 

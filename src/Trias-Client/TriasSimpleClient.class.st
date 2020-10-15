@@ -458,6 +458,7 @@ TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDur
 				at: self class parameterEventsNumberOfResults
 					put: maximumNumberOfResults;
 				yourself).
+
 	triasDocument := XMLDOMParser parse: response.
 	responseElement := triasDocument
 		findElementNamed: 'StopEventResponse'.
@@ -547,8 +548,7 @@ TriasSimpleClient >> handleErrorIn: responseElement [
 		ifNotNil: [ :errorElement | 
 			(errorElement elementAt: 'Code')
 				ifNotNil: [ :codeElement | 
-					TriasRequestError new 
-						code: codeElement strings anyOne;
+					(TriasRequestError errorFromCode:  codeElement strings anyOne) 
 						text: ((errorElement elementAt: 'Text') elementAt: 'Text') strings anyOne;
 						signal ] ]
 ]
