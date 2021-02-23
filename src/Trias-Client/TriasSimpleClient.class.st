@@ -67,6 +67,12 @@ TriasSimpleClient class >> parameterEventsNumberOfResults [
 ]
 
 { #category : #'accessing - request parameters' }
+TriasSimpleClient class >> parameterEventsOnwardCall [
+
+	^ #eventsOwardCall
+]
+
+{ #category : #'accessing - request parameters' }
 TriasSimpleClient class >> parameterEventsStartTimestamp [
 
 	^ #eventsStartTimestamp
@@ -222,7 +228,7 @@ TriasSimpleClient class >> scriptGenerateEventRequestTemplate [
 		LocationRef StopPointRef:  (self parameterHookFor: self parameterEventsLocationId).
 	req ServiceRequest RequestPayload StopEventRequest Location
 		DepArrTime:  (self parameterHookFor: self parameterEventsStartTimestamp).
-	req ServiceRequest RequestPayload StopEventRequest Params NumberOfResults: (self parameterHookFor: self parameterEventsNumberOfResults); TimeWindow: (self parameterHookFor: self parameterEventsTimeWindow); StopEventType: (self parameterHookFor: self parameterEventsType).
+	req ServiceRequest RequestPayload StopEventRequest Params NumberOfResults: (self parameterHookFor: self parameterEventsNumberOfResults); TimeWindow: (self parameterHookFor: self parameterEventsTimeWindow); IncludeOnwardCalls: (self parameterHookFor: self parameterEventsOnwardCall); StopEventType: (self parameterHookFor: self parameterEventsType).
 	xml := PluggableXMLVisitor new
 		visit: req name: 'Trias';
 		document.
@@ -445,20 +451,27 @@ TriasSimpleClient >> getBusTripFrom: anOriginStopPointRef to: aDestinationStopPo
 
 { #category : #requesting }
 TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults [
+
+		^ self getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults onwardDepartures: false
+]
+
+{ #category : #requesting }
+TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults onwardDepartures: aBoolean [
 	| response triasDocument responseElement |
 	response := self
-		execute: self templateEventsRequest
+		execute: self templateEventsRequestWithOnwardDepartures
 		with:
 			(self defaultRequestParameters
 				at: self class parameterEventsLocationId put: locationId;
 				at: self class parameterEventsStartTimestamp
 					put: aDateAndTime printString;
+				at: self class parameterEventsOnwardCall
+					put: aBoolean;
 				at: self class parameterEventsTimeWindow put: aDurationString;
 				at: self class parameterEventsType put: eventType;
 				at: self class parameterEventsNumberOfResults
 					put: maximumNumberOfResults;
 				yourself).
-
 	triasDocument := XMLDOMParser parse: response.
 	responseElement := triasDocument
 		findElementNamed: 'StopEventResponse'.
@@ -655,6 +668,14 @@ TriasSimpleClient >> templateEventsRequest [
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
 <Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><StopEventRequest><Location><LocationRef><StopPointRef>{{eventsLocationId}}</StopPointRef></LocationRef><DepArrTime>{{eventsStartTimestamp}}</DepArrTime></Location><Params><NumberOfResults>{{eventsNumberOfResults}}</NumberOfResults><TimeWindow>{{eventsTimeWindow}}</TimeWindow><StopEventType>{{eventsType}}</StopEventType></Params></StopEventRequest></RequestPayload></ServiceRequest></Trias>'
+]
+
+{ #category : #'private - templates' }
+TriasSimpleClient >> templateEventsRequestWithOnwardDepartures [
+"self scriptGenerateEventRequestTemplate"
+
+^ '<?xml version="1.1" encoding="utf-8"?>
+<Trias xmlns="http://www.vdv.de/trias" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1"><ServiceRequest><RequestorRef xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema">{{requestorRef}}</RequestorRef><RequestPayload><StopEventRequest><Location><LocationRef><StopPointRef>{{eventsLocationId}}</StopPointRef></LocationRef><DepArrTime>{{eventsStartTimestamp}}</DepArrTime></Location><Params><NumberOfResults>{{eventsNumberOfResults}}</NumberOfResults><TimeWindow>{{eventsTimeWindow}}</TimeWindow><IncludeOnwardCalls>{{eventsOwardCall}}</IncludeOnwardCalls><StopEventType>{{eventsType}}</StopEventType></Params></StopEventRequest></RequestPayload></ServiceRequest></Trias>'
 ]
 
 { #category : #'private - templates' }
