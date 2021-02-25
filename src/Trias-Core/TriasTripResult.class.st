@@ -50,7 +50,7 @@ TriasTripResult >> initializeFromXML: anXMLElement [
 				element: 'Interchanges'
 				convert: #asNumber).
 	self legs: ((anXMLElement allElementsNamed: 'TripLeg') asOrderedCollection collect: [:eachLegElement |
-		TriasTripLeg new initializeFromXML: eachLegElement
+		TriasTripLeg fromXML: eachLegElement
 		]).
 	
 ]

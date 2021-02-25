@@ -3,13 +3,12 @@ Class {
 	#superclass : #TriasObject,
 	#instVars : [
 		'resultId',
-		'stopPointRef',
-		'stopPointName',
-		'serviceDeparture',
 		'operatingDayRef',
 		'lineRef',
 		'transportationMode',
-		'transportationSubMode'
+		'transportationSubMode',
+		'departure',
+		'onwardDepartures'
 	],
 	#category : #'Trias-Core-Model'
 }
@@ -27,14 +26,25 @@ TriasEventResult class >> xmlElementName [
 	^ 'EventResult'
 ]
 
+{ #category : #accessing }
+TriasEventResult >> departure [
+
+	^ departure
+]
+
+{ #category : #accessing }
+TriasEventResult >> departure: anEventDeparture [
+
+	departure := anEventDeparture
+]
+
 { #category : #initialization }
 TriasEventResult >> initializeFromXML: anXMLElement [
 
 
 	self resultId: (self extractValueFrom: anXMLElement element: 'ResultId').
-	self stopPointRef: (self extractValueFrom: anXMLElement element: 'StopPointRef').
-	self stopPointName: (self extractValueFrom:(anXMLElement findElementNamed: 'StopPointName') element: 'Text').
-	self serviceDeparture: (self extractValueFrom: (anXMLElement findElementNamed: 'ServiceDeparture') element: 'TimetabledTime' convert: [:string | DateAndTime fromString: string ]).
+	self departure: (TriasEventDeparture fromXML: (anXMLElement findElementNamed: 'ThisCall')).
+	self onwardDepartures: ((anXMLElement allElementsNamed: 'OnwardCall') collect: [:each | TriasEventDeparture fromXML: each ]).
 	self operatingDayRef:  (self extractValueFrom: anXMLElement element: 'OperatingDayRef' convert: [:string | Date fromString: string]).
 	self lineRef:  (self extractValueFrom: anXMLElement element: 'LineRef').
 	self transportationMode:  (self extractValueFrom: anXMLElement element: 'PtMode').
@@ -55,6 +65,18 @@ TriasEventResult >> lineRef [
 TriasEventResult >> lineRef: aString [
 
 	lineRef := aString
+]
+
+{ #category : #accessing }
+TriasEventResult >> onwardDepartures [
+
+	^ onwardDepartures
+]
+
+{ #category : #accessing }
+TriasEventResult >> onwardDepartures: aCollectionOfDepartures [
+
+	onwardDepartures := aCollectionOfDepartures 
 ]
 
 { #category : #accessing }
@@ -84,37 +106,19 @@ TriasEventResult >> resultId: aString [
 { #category : #accessing }
 TriasEventResult >> serviceDeparture [
 
-	^ serviceDeparture
-]
-
-{ #category : #accessing }
-TriasEventResult >> serviceDeparture: aDateAndTime [
-
-	serviceDeparture := aDateAndTime
+	^ self departure serviceDeparture
 ]
 
 { #category : #accessing }
 TriasEventResult >> stopPointName [
 
-	^ stopPointName 
-]
-
-{ #category : #accessing }
-TriasEventResult >> stopPointName: aString [
-
-	stopPointName := aString
+	^ self departure stopPointName 
 ]
 
 { #category : #accessing }
 TriasEventResult >> stopPointRef [
 
-	^ stopPointRef
-]
-
-{ #category : #accessing }
-TriasEventResult >> stopPointRef: aString [
-
-	stopPointRef := aString
+	^ self departure stopPointRef
 ]
 
 { #category : #accessing }
