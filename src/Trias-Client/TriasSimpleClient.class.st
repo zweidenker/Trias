@@ -488,6 +488,7 @@ TriasSimpleClient >> getLocationRefinement: aLocationId [
 	| response triasDocument trias |
 	response := self execute: self templateRefinementStopRequest  with: (self defaultRequestParameters at: self class parameterLocationRef  put: aLocationId ; yourself).
 	triasDocument := XMLDOMParser parse: response.
+	self handleErrorIn: triasDocument.
 	trias := TriasNodeVisitor new
 		visitDocument: triasDocument.
 	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults first "there should be only one result for a refinement request"

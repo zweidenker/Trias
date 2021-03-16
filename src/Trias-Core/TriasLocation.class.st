@@ -52,6 +52,11 @@ TriasLocation >> locationName: aTriasLocationName [
 	name := aTriasLocationName 
 ]
 
+{ #category : #accessing }
+TriasLocation >> name [
+	^ name 
+]
+
 { #category : #'as yet unclassified' }
 TriasLocation >> pointOfInterest: aTriasPointOfInterest [ 
 	poi := TriasPointOfInterest 
