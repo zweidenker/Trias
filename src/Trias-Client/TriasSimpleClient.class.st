@@ -426,7 +426,7 @@ TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters at
 			(ZnEntity
 				xml: (self process: aRequestTemplateString with: mustacheParameters)).
 	response := [ client post ]
-		on: ConnectionTimedOut , ZnUnknownHttpVersion 
+		on: ConnectionTimedOut , ZnUnknownHttpVersion  , NameLookupFailure
 		do: [ :ex | 
 			 (aNumber > self timeoutRetries)
 				ifTrue: [ ex pass ]
