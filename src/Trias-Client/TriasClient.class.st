@@ -1,5 +1,5 @@
 Class {
-	#name : #TriasSimpleClient,
+	#name : #TriasClient,
 	#superclass : #Object,
 	#instVars : [
 		'url',
@@ -13,7 +13,7 @@ Class {
 }
 
 { #category : #accessing }
-TriasSimpleClient class >> eventTypeArrival [
+TriasClient class >> eventTypeArrival [
 
 	"<xs:restriction base=""xs:string"">
 			<xs:enumeration value=""departure""/>
@@ -25,7 +25,7 @@ TriasSimpleClient class >> eventTypeArrival [
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> eventTypeBoth [
+TriasClient class >> eventTypeBoth [
 
 	"<xs:restriction base=""xs:string"">
 			<xs:enumeration value=""departure""/>
@@ -37,7 +37,7 @@ TriasSimpleClient class >> eventTypeBoth [
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> eventTypeDeparture [
+TriasClient class >> eventTypeDeparture [
 
 	"<xs:restriction base=""xs:string"">
 			<xs:enumeration value=""departure""/>
@@ -49,108 +49,108 @@ TriasSimpleClient class >> eventTypeDeparture [
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterDestinationRef [
+TriasClient class >> parameterDestinationRef [
 
 	^ #destinationRef
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterEventsLocationId [
+TriasClient class >> parameterEventsLocationId [
 
 	^ #eventsLocationId
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterEventsNumberOfResults [
+TriasClient class >> parameterEventsNumberOfResults [
 
 	^ #eventsNumberOfResults
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterEventsOnwardCall [
+TriasClient class >> parameterEventsOnwardCall [
 
 	^ #eventsOwardCall
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterEventsStartTimestamp [
+TriasClient class >> parameterEventsStartTimestamp [
 
 	^ #eventsStartTimestamp
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterEventsTimeWindow [
+TriasClient class >> parameterEventsTimeWindow [
 
 	^ #eventsTimeWindow
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterEventsType [
+TriasClient class >> parameterEventsType [
 
 	^ #eventsType
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterHookFor: aParameterName [
+TriasClient class >> parameterHookFor: aParameterName [
 
 	^ '{{' , aParameterName , '}}'
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterLatitude [
+TriasClient class >> parameterLatitude [
 
 	^ #latitude
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterLocationName [
+TriasClient class >> parameterLocationName [
 
 	^ #locationName
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterLocationRef [
+TriasClient class >> parameterLocationRef [
 
 	^ #locationRef
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterLongitude [
+TriasClient class >> parameterLongitude [
 
 	^ #longitude
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterOriginRef [
+TriasClient class >> parameterOriginRef [
 
 	^ #originRef
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterRequestTimestamp [
+TriasClient class >> parameterRequestTimestamp [
 
 	^ #requestTimestamp
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> parameterRequestorRef [
+TriasClient class >> parameterRequestorRef [
 
 	^ #requestorRef
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> requestorRef [
+TriasClient class >> requestorRef [
 	^ requestorRef ifNil: [ 
 		Error signal: 'RequestorRef has to be set' ]
 ]
 
 { #category : #'accessing - request parameters' }
-TriasSimpleClient class >> requestorRef: anObject [
+TriasClient class >> requestorRef: anObject [
 	requestorRef := anObject
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> scriptEventResponseXSD [
+TriasClient class >> scriptEventResponseXSD [
 		| mainSchemaFile schemas element |
 	mainSchemaFile := '../trias/Trias.xsd' asFileReference.
 	schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
@@ -158,7 +158,7 @@ TriasSimpleClient class >> scriptEventResponseXSD [
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> scriptGenerateBusTripRequestTemplate [
+TriasClient class >> scriptGenerateBusTripRequestTemplate [
 
 | mainSchemaFile schemas req xml xmlString xmString |
 mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
@@ -217,7 +217,7 @@ xml root attributeAt: 'version' put: '1.1'.
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> scriptGenerateEventRequestTemplate [
+TriasClient class >> scriptGenerateEventRequestTemplate [
 	| mainSchemaFile schemas req xml xmlString |
 	mainSchemaFile := '../trias/Trias.xsd' asFileReference.
 	schemas := (XSDSchemaReader file: mainSchemaFile) schemas.
@@ -244,7 +244,7 @@ TriasSimpleClient class >> scriptGenerateEventRequestTemplate [
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> scriptGenerateStopFromAreaRequestTemplate [
+TriasClient class >> scriptGenerateStopFromAreaRequestTemplate [
 
 | response triasDocument trias mainSchemaFile schemas req area xml xmlString result aPolygon polyline |
 	
@@ -272,7 +272,7 @@ xmlString := String streamContents: [ :stream | | writer |
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> scriptGenerateStopRefinementRequestTemplate [
+TriasClient class >> scriptGenerateStopRefinementRequestTemplate [
 
 		| mainSchemaFile schemas req xml xmlString |
 	mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
@@ -300,7 +300,7 @@ xmlString := String streamContents: [ :stream | | writer |
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> scriptGenerateStopRequestTemplate [
+TriasClient class >> scriptGenerateStopRequestTemplate [
 
 		| mainSchemaFile schemas req xml xmlString |
 	mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
@@ -329,7 +329,7 @@ xmlString := String streamContents: [ :stream | | writer |
 ]
 
 { #category : #accessing }
-TriasSimpleClient class >> scriptGenerateTripRequestTemplate [
+TriasClient class >> scriptGenerateTripRequestTemplate [
 
 | mainSchemaFile schemas req xml xmlString xmString |
 mainSchemaFile := 	'../trias/Trias.xsd' asFileReference.
@@ -388,7 +388,7 @@ xml root attributeAt: 'version' put: '1.1'.
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> dataRequestString [
+TriasClient >> dataRequestString [
 	^ '<?xml version="1.0" encoding="UTF-8"?>
 <Trias version="1.1" xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/trias file:///C:/development/HEAD/extras/TRIAS/TRIAS_1.1/Trias.xsd">
     <ServiceRequest>
@@ -405,19 +405,19 @@ TriasSimpleClient >> dataRequestString [
 ]
 
 { #category : #accessing }
-TriasSimpleClient >> defaultRequestParameters [
+TriasClient >> defaultRequestParameters [
 	^ { 
 		self class parameterRequestorRef  -> (self class requestorRef) } asDictionary 
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters [
+TriasClient >> execute: aRequestTemplateString with: mustacheParameters [
 
 	^ self execute: aRequestTemplateString with: mustacheParameters attempt: 1
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters attempt: aNumber [
+TriasClient >> execute: aRequestTemplateString with: mustacheParameters attempt: aNumber [
 	| client response |
 	client := ZnClient new
 		timeout: self timeout;
@@ -438,25 +438,25 @@ TriasSimpleClient >> execute: aRequestTemplateString with: mustacheParameters at
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
+TriasClient >> getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
 
 	^ self getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: DateAndTime now
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
+TriasClient >> getBusTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
 
 	^ self getTrip: self templateBusTripRequest from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults [
+TriasClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults [
 
 		^ self getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults onwardDepartures: false
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults onwardDepartures: aBoolean [
+TriasClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDurationString type: eventType limit: maximumNumberOfResults onwardDepartures: aBoolean [
 	| response triasDocument responseElement |
 	response := self
 		execute: self templateEventsRequestWithOnwardDepartures
@@ -483,7 +483,7 @@ TriasSimpleClient >> getEventsFor: locationId timestamp: aDateAndTime till: aDur
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getLocationRefinement: aLocationId [
+TriasClient >> getLocationRefinement: aLocationId [
 
 	| response triasDocument trias |
 	response := self execute: self templateRefinementStopRequest  with: (self defaultRequestParameters at: self class parameterLocationRef  put: aLocationId ; yourself).
@@ -494,7 +494,7 @@ TriasSimpleClient >> getLocationRefinement: aLocationId [
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getLocations: aLocationPatternString [
+TriasClient >> getLocations: aLocationPatternString [
 
 	| response triasDocument trias |
 	response := self execute: self templateStopRequest with: (self defaultRequestParameters at: self class parameterLocationName put: aLocationPatternString ; yourself).
@@ -505,7 +505,7 @@ TriasSimpleClient >> getLocations: aLocationPatternString [
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getLocationsFromArea: aPolygon [
+TriasClient >> getLocationsFromArea: aPolygon [
 
 	| response triasDocument trias |
 	response := self execute: self templateStopFromAreaRequest with: (self defaultRequestParameters at: 'Points' put: (aPolygon coordinates collect: [ :eachPoint | { 'longitude' -> eachPoint x. 'latitude' -> eachPoint y } asDictionary ]) ; yourself).
@@ -516,7 +516,7 @@ TriasSimpleClient >> getLocationsFromArea: aPolygon [
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude radius: aRadiusInMeter [
+TriasClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude radius: aRadiusInMeter [
 
 	| response triasDocument trias |
 	response := self execute: self templateStopFromCircleRequest with: (self defaultRequestParameters at: 'longitude' put: aLongitude ; at: 'latitude' put: aLatitude; at: 'radius' put: aRadiusInMeter; at: 'locationName' put: 'Karlsruhe';yourself).
@@ -527,7 +527,7 @@ TriasSimpleClient >> getLocationsFromLongitude: aLongitude latitude: aLatitude r
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getTrip: requestTemplate from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
+TriasClient >> getTrip: requestTemplate from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
 
 	| response triasDocument responseElement |
 	response := self execute: requestTemplate with: (self defaultRequestParameters at: self class parameterOriginRef  put: anOriginStopPointRef ;
@@ -544,19 +544,19 @@ TriasSimpleClient >> getTrip: requestTemplate from: anOriginStopPointRef to: aDe
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
+TriasClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
 
 	^ self getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: DateAndTime now
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
+TriasClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime [
 
 	^ self getTrip: self templateTripRequest from: anOriginStopPointRef to: aDestinationStopPointRef at: aDateAndTime
 ]
 
 { #category : #requesting }
-TriasSimpleClient >> handleErrorIn: responseElement [
+TriasClient >> handleErrorIn: responseElement [
 	(responseElement findElementNamed: 'ErrorMessage')
 		ifNotNil: [ :errorElement | 
 			(errorElement elementAt: 'Code')
@@ -567,7 +567,7 @@ TriasSimpleClient >> handleErrorIn: responseElement [
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> locationRequestString [
+TriasClient >> locationRequestString [
 	^ '<?xml version="1.0" encoding="UTF-8"?>
 <Trias version="1.1" xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/trias file:///C:/development/HEAD/extras/TRIAS/TRIAS_1.1/Trias.xsd">
     <ServiceRequest>
@@ -585,7 +585,7 @@ TriasSimpleClient >> locationRequestString [
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> locationRequestString2 [
+TriasClient >> locationRequestString2 [
 	^ '<?xml version="1.0" encoding="UTF-8"?>
 <Trias version="1.1" xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/trias file:///C:/development/HEAD/extras/TRIAS/TRIAS_1.1/Trias.xsd">
     <ServiceRequest>
@@ -606,17 +606,17 @@ TriasSimpleClient >> locationRequestString2 [
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> process: aString [ 
+TriasClient >> process: aString [ 
 	^ aString asMustacheTemplate value: self requestParameters
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> process: aString with: aDictionary [
+TriasClient >> process: aString with: aDictionary [
 	^ aString asMustacheTemplate value: aDictionary
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> requestData [
+TriasClient >> requestData [
 
 	| client response |
 	client := ZnClient new 
@@ -627,7 +627,7 @@ TriasSimpleClient >> requestData [
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> requestLoca [
+TriasClient >> requestLoca [
 
 	| client response |
 	client := ZnClient new 
@@ -638,13 +638,13 @@ TriasSimpleClient >> requestLoca [
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> requestParameters [
+TriasClient >> requestParameters [
 	^ { 
 		#requestorRef -> (self class requestorRef) } asDictionary 
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> requestTrip [
+TriasClient >> requestTrip [
 
 	| client response |
 	client := ZnClient new 
@@ -655,7 +655,7 @@ TriasSimpleClient >> requestTrip [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateBusTripRequest [
+TriasClient >> templateBusTripRequest [
 "self scriptGenerateBusTripRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -663,7 +663,7 @@ TriasSimpleClient >> templateBusTripRequest [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateEventsRequest [
+TriasClient >> templateEventsRequest [
 "self scriptGenerateEventRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -671,7 +671,7 @@ TriasSimpleClient >> templateEventsRequest [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateEventsRequestWithOnwardDepartures [
+TriasClient >> templateEventsRequestWithOnwardDepartures [
 "self scriptGenerateEventRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -679,7 +679,7 @@ TriasSimpleClient >> templateEventsRequestWithOnwardDepartures [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateRefinementStopRequest [
+TriasClient >> templateRefinementStopRequest [
 "self scriptGenerateStopRefinementRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -687,7 +687,7 @@ TriasSimpleClient >> templateRefinementStopRequest [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateStopFromAreaRequest [
+TriasClient >> templateStopFromAreaRequest [
 "self scriptGenerateStopRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -695,7 +695,7 @@ TriasSimpleClient >> templateStopFromAreaRequest [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateStopFromCircleRequest [
+TriasClient >> templateStopFromCircleRequest [
 "self scriptGenerateStopCircleTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -703,7 +703,7 @@ TriasSimpleClient >> templateStopFromCircleRequest [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateStopRequest [
+TriasClient >> templateStopRequest [
 "self scriptGenerateStopRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -711,7 +711,7 @@ TriasSimpleClient >> templateStopRequest [
 ]
 
 { #category : #'private - templates' }
-TriasSimpleClient >> templateTripRequest [
+TriasClient >> templateTripRequest [
 "self scriptGenerateTripRequestTemplate"
 
 ^ '<?xml version="1.1" encoding="utf-8"?>
@@ -719,32 +719,32 @@ TriasSimpleClient >> templateTripRequest [
 ]
 
 { #category : #accessing }
-TriasSimpleClient >> timeout [ 
+TriasClient >> timeout [ 
 
 	^ timeout ifNil: [ timeout :=  120 ]
 ]
 
 { #category : #accessing }
-TriasSimpleClient >> timeout: aNumberOfSeconds [
+TriasClient >> timeout: aNumberOfSeconds [
 
 	timeout := aNumberOfSeconds
 ]
 
 { #category : #accessing }
-TriasSimpleClient >> timeoutRetries [
+TriasClient >> timeoutRetries [
 	"sometimes it might help to retry a request after getting a timeout.
 	By default do not attempt any retry"
 	^ timeoutRetries ifNil: [ 0 ]
 ]
 
 { #category : #accessing }
-TriasSimpleClient >> timeoutRetries: aNumber [
+TriasClient >> timeoutRetries: aNumber [
 
 	timeoutRetries := aNumber
 ]
 
 { #category : #'as yet unclassified' }
-TriasSimpleClient >> tripRequestString [
+TriasClient >> tripRequestString [
 	^ '<?xml version="1.0" encoding="UTF-8"?>
 <Trias version="1.1" xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/trias file:///C:/development/HEAD/extras/TRIAS/TRIAS_1.1/Trias.xsd">
     <ServiceRequest>
@@ -778,11 +778,11 @@ TriasSimpleClient >> tripRequestString [
 ]
 
 { #category : #accessing }
-TriasSimpleClient >> url [
+TriasClient >> url [
 	^ url
 ]
 
 { #category : #accessing }
-TriasSimpleClient >> url: anObject [
+TriasClient >> url: anObject [
 	url := anObject
 ]
