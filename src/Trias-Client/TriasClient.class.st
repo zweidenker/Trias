@@ -426,7 +426,7 @@ TriasClient >> execute: aRequestTemplateString with: mustacheParameters attempt:
 			(ZnEntity
 				xml: (self process: aRequestTemplateString with: mustacheParameters)).
 	response := [ client post ]
-		on: ConnectionTimedOut , ZnUnknownHttpVersion 
+		on: ConnectionTimedOut , ZnUnknownHttpVersion  , NameLookupFailure
 		do: [ :ex | 
 			 (aNumber > self timeoutRetries)
 				ifTrue: [ ex pass ]
@@ -488,6 +488,7 @@ TriasClient >> getLocationRefinement: aLocationId [
 	| response triasDocument trias |
 	response := self execute: self templateRefinementStopRequest  with: (self defaultRequestParameters at: self class parameterLocationRef  put: aLocationId ; yourself).
 	triasDocument := XMLDOMParser parse: response.
+	self handleErrorIn: triasDocument.
 	trias := TriasNodeVisitor new
 		visitDocument: triasDocument.
 	^ trias trias serviceDelivery deliveryPayload locationInformationResponse locationResults first "there should be only one result for a refinement request"
