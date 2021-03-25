@@ -53,7 +53,7 @@ TriasMockClient >> installMockStop: aString [
 { #category : #'services - mocking' }
 TriasMockClient >> installMockStopEvent [
 	
-	self installRepeatedMockStop: self mockForStopEvent 
+	self installRepeatedMockStopEvent: self mockForStopEvent 
 ]
 
 { #category : #'services - mocking' }
@@ -70,15 +70,23 @@ TriasMockClient >> installRepeatedMockStop: aString [
 	 	shouldBe: aString 
 ]
 
+{ #category : #'services - mocking' }
+TriasMockClient >> installRepeatedMockStopEvent: aString [
+	
+	self 
+		addRepeatedResponseForRequest: #templateEventsRequestWithOnwardDepartures 
+	 	shouldBe: aString 
+]
+
 { #category : #'private - mocking' }
 TriasMockClient >> mockForStopEvent [
 
-	^ '<? xml version = "1.0" encoding = "UTF-8"?>
-<Trias xmlns = "http://www.vdv.de/trias" version = "1.1">
+	^ '<?xml version="1.0" encoding="UTF-8"?>
+<Trias xmlns="http://www.vdv.de/trias" version="1.1">
    <ServiceDelivery>
-      <ResponseTimestamp xmlns = "http://www.siri.org.uk/siri"> 2021-03-25T09: 53: 02Z </ResponseTimestamp>
-      <ProducerRef xmlns = "http://www.siri.org.uk/siri"> EFAController10.3.17.15-EFA03 </ProducerRef>
-      <Status xmlns = "http://www.siri.org.uk/siri"> true </Status>
+      <ResponseTimestamp xmlns="http://www.siri.org.uk/siri"> 2021-03-25T09: 53: 02Z </ResponseTimestamp>
+      <ProducerRef xmlns="http://www.siri.org.uk/siri"> EFAController10.3.17.15-EFA03 </ProducerRef>
+      <Status xmlns="http://www.siri.org.uk/siri"> true </Status>
       <MoreData> false </MoreData>
       <Language> de </Language>
       <DeliveryPayload>
@@ -87,91 +95,91 @@ TriasMockClient >> mockForStopEvent [
                <Situations />
             </StopEventResponseContext>
             <StopEventResult>
-               <ResultId> ID-98280E11-0C07-47BE-BE5C-20750835DA9D </ResultId>
+               <ResultId>ID-98280E11-0C07-47BE-BE5C-20750835DA9D</ResultId>
                <StopEvent>
                   <ThisCall>
                      <CallAtStop>
-                        <StopPointRef> de: 08212: 3105: 0: 2 </StopPointRef>
+                        <StopPointRef>de:08212:3105:0:2</StopPointRef>
                         <StopPointName>
-                           <Text> Hagsfeld Pfizer </Text>
-                           <Language> de </Language>
+                           <Text>Hagsfeld Pfizer</Text>
+                           <Language>de</Language>
                         </StopPointName>
                         <ServiceDeparture>
-                           <TimetabledTime> 2021-01-25T03: 05: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:05:00Z</TimetabledTime>
                         </ServiceDeparture>
-                        <StopSeqNumber> 4 </StopSeqNumber>
+                        <StopSeqNumber>4</StopSeqNumber>
                      </CallAtStop>
                   </ThisCall>
                   <OnwardCall>
                      <CallAtStop>
-                        <StopPointRef> de: 08212: 3102: 12: 12 </StopPointRef>
+                        <StopPointRef>de:08212:3102:12:12</StopPointRef>
                         <StopPointName>
-                           <Text> Hagsfeld Bahnhof </Text>
-                           <Language> de </Language>
+                           <Text>Hagsfeld Bahnhof</Text>
+                           <Language>de</Language>
                         </StopPointName>
                         <ServiceArrival>
                            <TimetabledTime> 2021-01-25T03: 06: 00Z </TimetabledTime>
                         </ServiceArrival>
                         <ServiceDeparture>
-                           <TimetabledTime> 2021-01-25T03: 06: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:06:00Z</TimetabledTime>
                         </ServiceDeparture>
-                        <StopSeqNumber> 2 </StopSeqNumber>
+                        <StopSeqNumber>2</StopSeqNumber>
                      </CallAtStop>
                   </OnwardCall>
                   <OnwardCall>
                      <CallAtStop>
-                        <StopPointRef> de: 08212: 3104: 0: 2 </StopPointRef>
+                        <StopPointRef>de:08212:3104:0:2</StopPointRef>
                         <StopPointName>
                            <Text> Hagsfeld Julius-Bender-Straße </Text>
-                           <Language> de </Language>
+                           <Language>de</Language>
                         </StopPointName>
                         <ServiceArrival>
-                           <TimetabledTime> 2021-01-25T03: 07: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:07:00Z</TimetabledTime>
                         </ServiceArrival>
                         <ServiceDeparture>
-                           <TimetabledTime> 2021-01-25T03: 07: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:07:00Z</TimetabledTime>
                         </ServiceDeparture>
-                        <StopSeqNumber> 3 </StopSeqNumber>
+                        <StopSeqNumber>3</StopSeqNumber>
                      </CallAtStop>
                   </OnwardCall>
                   <Service>
-                     <OperatingDayRef> 2021-01-25 </OperatingDayRef>
-                     <JourneyRef> kvv: 03094: E: H: j21: 24 </JourneyRef>
-                     <LineRef> kvv: 03094: E: H </LineRef>
-                     <DirectionRef> outward </DirectionRef>
+                     <OperatingDayRef>2021-01-25</OperatingDayRef>
+                     <JourneyRef>kvv:03094:E:H:j21:24</JourneyRef>
+                     <LineRef>kvv:03094:E:H</LineRef>
+                     <DirectionRef>outward</DirectionRef>
                      <Mode>
-                        <PtMode> bus </PtMode>
-                        <BusSubmode> localBus </BusSubmode>
+                        <PtMode>bus</PtMode>
+                        <BusSubmode>localBus</BusSubmode>
                         <name>
-                           <Text> Nightliner </Text>
-                           <Language> de </Language>
+                           <Text>Nightliner</Text>
+                           <Language>de</Language>
                         </name>
                      </Mode>
                      <PublishedLineName>
                         <Text> Nightliner NL4 </Text>
-                        <Language> de </Language>
+                        <Language>de</Language>
                      </PublishedLineName>
-                     <OperatorRef> kvv: 02 </OperatorRef>
+                     <OperatorRef>kvv:02</OperatorRef>
                      <RouteDescription>
                         <Text> Hagsfeld - Waldstadt - Marktplatz </Text>
-                        <Language> de </Language>
+                        <Language>de</Language>
                      </RouteDescription>
                      <Attribute>
-                        <text>
+                        <Text>
                            <Text> Low-floor wagon </Text>
-                           <Language> de </Language>
+                           <Language>de</Language>
                         </Text>
-                        <Code> 126887 </Code>
-                        <Mandatory> false </Mandatory>
+                        <Code>126887</Code>
+                        <Mandatory>false</Mandatory>
                      </Attribute>
-                     <OriginStopPointRef> de: 08212: 3109: 0: 2 </OriginStopPointRef>
+                     <OriginStopPointRef>de:08212:3109:0:2</OriginStopPointRef>
                      <OriginText>
                         <Text> Hagsfeld Storrenacker Süd </Text>
                         <Language> de </Language>
                      </OriginText>
                      <DestinationText>
                         <Text> NL 4 Marketplace </Text>
-                        <Language> de </Language>
+                        <Language>de</Language>
                      </DestinationText>
                   </Service>
                </StopEvent>
@@ -185,12 +193,12 @@ TriasMockClient >> mockForStopEvent [
 { #category : #'private - mocking' }
 TriasMockClient >> mockForStopEventWithDuplicatedCoordinates [
 
-	^ '<? xml version = "1.0" encoding = "UTF-8"?>
-<Trias xmlns = "http://www.vdv.de/trias" version = "1.1">
+	^ '<?xml version="1.0" encoding="UTF-8"?>
+<Trias xmlns="http://www.vdv.de/trias" version="1.1">
    <ServiceDelivery>
-      <ResponseTimestamp xmlns = "http://www.siri.org.uk/siri"> 2021-03-25T09: 53: 02Z </ResponseTimestamp>
-      <ProducerRef xmlns = "http://www.siri.org.uk/siri"> EFAController10.3.17.15-EFA03 </ProducerRef>
-      <Status xmlns = "http://www.siri.org.uk/siri"> true </Status>
+      <ResponseTimestamp xmlns="http://www.siri.org.uk/siri"> 2021-03-25T09: 53: 02Z </ResponseTimestamp>
+      <ProducerRef xmlns="http://www.siri.org.uk/siri"> EFAController10.3.17.15-EFA03 </ProducerRef>
+      <Status xmlns="http://www.siri.org.uk/siri"> true </Status>
       <MoreData> false </MoreData>
       <Language> de </Language>
       <DeliveryPayload>
@@ -199,91 +207,91 @@ TriasMockClient >> mockForStopEventWithDuplicatedCoordinates [
                <Situations />
             </StopEventResponseContext>
             <StopEventResult>
-               <ResultId> ID-98280E11-0C07-47BE-BE5C-20750835DA9D </ResultId>
+               <ResultId>ID-98280E11-0C07-47BE-BE5C-20750835DA9D</ResultId>
                <StopEvent>
                   <ThisCall>
                      <CallAtStop>
-                        <StopPointRef> de: 08212: 3105: 0: 2 </StopPointRef>
+                        <StopPointRef>de:08212:3105:0:2</StopPointRef>
                         <StopPointName>
-                           <Text> Hagsfeld Pfizer </Text>
-                           <Language> de </Language>
+                           <Text>Hagsfeld Pfizer</Text>
+                           <Language>de</Language>
                         </StopPointName>
                         <ServiceDeparture>
-                           <TimetabledTime> 2021-01-25T03: 05: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:05:00Z</TimetabledTime>
                         </ServiceDeparture>
-                        <StopSeqNumber> 4 </StopSeqNumber>
+                        <StopSeqNumber>4</StopSeqNumber>
                      </CallAtStop>
                   </ThisCall>
                   <OnwardCall>
                      <CallAtStop>
-                        <StopPointRef> de: 08212: 3102: 12: 12 </StopPointRef>
+                        <StopPointRef>de:08212:3102:12:12</StopPointRef>
                         <StopPointName>
-                           <Text> Hagsfeld Bahnhof </Text>
-                           <Language> de </Language>
+                           <Text>Hagsfeld Bahnhof</Text>
+                           <Language>de</Language>
                         </StopPointName>
                         <ServiceArrival>
                            <TimetabledTime> 2021-01-25T03: 06: 00Z </TimetabledTime>
                         </ServiceArrival>
                         <ServiceDeparture>
-                           <TimetabledTime> 2021-01-25T03: 06: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:06:00Z</TimetabledTime>
                         </ServiceDeparture>
-                        <StopSeqNumber> 2 </StopSeqNumber>
+                        <StopSeqNumber>2</StopSeqNumber>
                      </CallAtStop>
                   </OnwardCall>
                   <OnwardCall>
                      <CallAtStop>
-                        <StopPointRef> de: 08212: 3104: 0: 2 </StopPointRef>
+                        <StopPointRef>de:08212:3104:0:2</StopPointRef>
                         <StopPointName>
                            <Text> Hagsfeld Julius-Bender-Straße </Text>
-                           <Language> de </Language>
+                           <Language>de</Language>
                         </StopPointName>
                         <ServiceArrival>
-                           <TimetabledTime> 2021-01-25T03: 07: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:07:00Z</TimetabledTime>
                         </ServiceArrival>
                         <ServiceDeparture>
-                           <TimetabledTime> 2021-01-25T03: 07: 00Z </TimetabledTime>
+                           <TimetabledTime>2021-01-25T03:07:00Z</TimetabledTime>
                         </ServiceDeparture>
-                        <StopSeqNumber> 3 </StopSeqNumber>
+                        <StopSeqNumber>3</StopSeqNumber>
                      </CallAtStop>
                   </OnwardCall>
                   <Service>
-                     <OperatingDayRef> 2021-01-25 </OperatingDayRef>
-                     <JourneyRef> kvv: 03094: E: H: j21: 24 </JourneyRef>
-                     <LineRef> kvv: 03094: E: H </LineRef>
-                     <DirectionRef> outward </DirectionRef>
+                     <OperatingDayRef>2021-01-25</OperatingDayRef>
+                     <JourneyRef>kvv:03094:E:H:j21:24</JourneyRef>
+                     <LineRef>kvv:03094:E:H</LineRef>
+                     <DirectionRef>outward</DirectionRef>
                      <Mode>
-                        <PtMode> bus </PtMode>
-                        <BusSubmode> localBus </BusSubmode>
+                        <PtMode>bus</PtMode>
+                        <BusSubmode>localBus</BusSubmode>
                         <name>
-                           <Text> Nightliner </Text>
-                           <Language> de </Language>
+                           <Text>Nightliner</Text>
+                           <Language>de</Language>
                         </name>
                      </Mode>
                      <PublishedLineName>
                         <Text> Nightliner NL4 </Text>
-                        <Language> de </Language>
+                        <Language>de</Language>
                      </PublishedLineName>
-                     <OperatorRef> kvv: 02 </OperatorRef>
+                     <OperatorRef>kvv:02</OperatorRef>
                      <RouteDescription>
                         <Text> Hagsfeld - Waldstadt - Marktplatz </Text>
-                        <Language> de </Language>
+                        <Language>de</Language>
                      </RouteDescription>
                      <Attribute>
-                        <text>
+                        <Text>
                            <Text> Low-floor wagon </Text>
-                           <Language> de </Language>
+                           <Language>de</Language>
                         </Text>
-                        <Code> 126887 </Code>
-                        <Mandatory> false </Mandatory>
+                        <Code>126887</Code>
+                        <Mandatory>false</Mandatory>
                      </Attribute>
-                     <OriginStopPointRef> de: 08212: 3109: 0: 2 </OriginStopPointRef>
+                     <OriginStopPointRef>de:08212:3109:0:2</OriginStopPointRef>
                      <OriginText>
                         <Text> Hagsfeld Storrenacker Süd </Text>
                         <Language> de </Language>
                      </OriginText>
                      <DestinationText>
                         <Text> NL 4 Marketplace </Text>
-                        <Language> de </Language>
+                        <Language>de</Language>
                      </DestinationText>
                   </Service>
                </StopEvent>
