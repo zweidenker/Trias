@@ -746,7 +746,7 @@ TriasMockClient >> resetMockStopEvent [
 	self  resetResponseForRequest: #templateEventsRequestWithOnwardDepartures.
 ]
 
-{ #category : #'private - mocking' }
+{ #category : #'private - mock installing' }
 TriasMockClient >> resetResponseForRequest: aRequestTemplateAccessor [ 
 	(mockResponses at: (self perform: aRequestTemplateAccessor) put: (WaitfreeQueue new)) .
 ]
