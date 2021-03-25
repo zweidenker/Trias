@@ -14,12 +14,12 @@ TriasMockClient class >> requestorRef [
 	^ ''
 ]
 
-{ #category : #'private - mocking' }
+{ #category : #'private - mock installing' }
 TriasMockClient >> addRepeatedResponseForRequest: aRequestTemplateAccessor shouldBe: aValue [
 	((repeatedMockResponses at: (self perform: aRequestTemplateAccessor) put: aValue)).
 ]
 
-{ #category : #'private - mocking' }
+{ #category : #'private - mock installing' }
 TriasMockClient >> addResponseForRequest: aRequestTemplateAccessor shouldBe: aBlock [
 	(self mockResponsesAt: (self perform: aRequestTemplateAccessor)) nextPut: aBlock.
 ]
@@ -42,7 +42,7 @@ TriasMockClient >> initialize [
 	repeatedMockResponses := Dictionary new
 ]
 
-{ #category : #'services - mocking' }
+{ #category : #'private - mock installing' }
 TriasMockClient >> installMockStop: aString [
 	
 	self 
@@ -50,7 +50,7 @@ TriasMockClient >> installMockStop: aString [
 	 	shouldBe: [aString ]
 ]
 
-{ #category : #'services - mocking' }
+{ #category : #'private - mock installing' }
 TriasMockClient >> installMockStopEvent: aString [
 	
 	self 
@@ -61,12 +61,20 @@ TriasMockClient >> installMockStopEvent: aString [
 { #category : #'services - mocking' }
 TriasMockClient >> installMockStopEventsOver: aNumberOfDays from: aDateAndTime [
 	
-	
-	self mockForStopEventAt: aDateAndTime.  
+	self resetMockStopEvent.
+	self installMockStopEvent: (self mockForStopEventAt: aDateAndTime).  
 	(1 to: aNumberOfDays) do: [ :eachIndex |
 			self installMockStopEvent: (self mockForStopEventAt: (aDateAndTime + eachIndex days) asDateAndTime  )
 		 ] 
 
+]
+
+{ #category : #'services - mocking' }
+TriasMockClient >> installMockStopEventsUnservedLocation [
+
+	self resetMockStopEvent.
+	self
+		installRepeatedMockStopEvent: self mockForStopEventUnservedLocation
 ]
 
 { #category : #'services - mocking' }
@@ -75,7 +83,7 @@ TriasMockClient >> installMockStopPfizer [
 	self installRepeatedMockStop: self mockForStopPfizer 
 ]
 
-{ #category : #'services - mocking' }
+{ #category : #'private - mock installing' }
 TriasMockClient >> installMockStopRefinement: aString [
 	
 	self 
@@ -102,6 +110,12 @@ TriasMockClient >> installMockStopRefinementAtRandomLocations: aNumberOfMocks [
 ]
 
 { #category : #'services - mocking' }
+TriasMockClient >> installMockTrip [
+	
+	self installRepeatedMockTrip: self mockForTrip
+]
+
+{ #category : #'private - mock installing' }
 TriasMockClient >> installRepeatedMockStop: aString [
 	
 	self 
@@ -109,11 +123,27 @@ TriasMockClient >> installRepeatedMockStop: aString [
 	 	shouldBe: aString 
 ]
 
-{ #category : #'services - mocking' }
+{ #category : #'private - mock installing' }
+TriasMockClient >> installRepeatedMockStopEvent: aString [
+	
+	self 
+		addRepeatedResponseForRequest: #templateEventsRequestWithOnwardDepartures 
+	 	shouldBe: aString 
+]
+
+{ #category : #'private - mock installing' }
 TriasMockClient >> installRepeatedMockStopRefinement: aString [
 	
 	self 
 		addRepeatedResponseForRequest: #templateRefinementStopRequest 
+	 	shouldBe: aString 
+]
+
+{ #category : #'private - mock installing' }
+TriasMockClient >> installRepeatedMockTrip: aString [
+	
+	self 
+		addRepeatedResponseForRequest: #templateTripRequest 
 	 	shouldBe: aString 
 ]
 
@@ -230,6 +260,12 @@ TriasMockClient >> mockForStopEventAt: aDateAndTime [
 ]
 
 { #category : #'private - mocking' }
+TriasMockClient >> mockForStopEventUnservedLocation [
+	^ '<?xml version="1.0" encoding="UTF-8"?>
+<Trias xmlns="http://www.vdv.de/trias" version="1.1"><ServiceDelivery><ResponseTimestamp xmlns="http://www.siri.org.uk/siri">2021-03-25T16:23:28Z</ResponseTimestamp><ProducerRef xmlns="http://www.siri.org.uk/siri">EFAController10.3.17.15-EFA-REALTIME</ProducerRef><Status xmlns="http://www.siri.org.uk/siri">true</Status><MoreData>false</MoreData><Language>de</Language><DeliveryPayload><StopEventResponse><ErrorMessage><Code>-4030</Code><Text><Text>STOPEVENT_LOCATIONUNSERVED</Text><Language>de</Language></Text></ErrorMessage><StopEventResponseContext><Situations></Situations></StopEventResponseContext></StopEventResponse></DeliveryPayload></ServiceDelivery></Trias>'
+]
+
+{ #category : #'private - mocking' }
 TriasMockClient >> mockForStopPfizer [
 
 	^ '<?xml version="1.0" encoding="UTF-8"?>
@@ -277,8 +313,440 @@ TriasMockClient >> mockForStopRefinementAtLatitude: aLatitude longitude: aLongit
 </Trias>'
 ]
 
+{ #category : #'private - mocking' }
+TriasMockClient >> mockForTrip [
+
+	^ '<?xml version="1.0" encoding="UTF-8"?>
+<Trias xmlns="http://www.vdv.de/trias" version="1.1">
+   <ServiceDelivery>
+      <ResponseTimestamp xmlns="http://www.siri.org.uk/siri">2021-03-25T14:45:24Z</ResponseTimestamp>
+      <ProducerRef xmlns="http://www.siri.org.uk/siri">EFAController10.3.17.15-EFA01</ProducerRef>
+      <Status xmlns="http://www.siri.org.uk/siri">true</Status>
+      <MoreData>false</MoreData>
+      <Language>de</Language>
+      <DeliveryPayload>
+         <TripResponse>
+            <TripResponseContext>
+               <Situations />
+            </TripResponseContext>
+            <TripResult>
+               <ResultId>ID-FDC9B095-0EBE-4EB9-980C-3B036277C3EE</ResultId>
+               <Trip>
+                  <TripId>ID-990EBA7E-BD40-49EB-B3B2-89AC5A357298</TripId>
+                  <Duration>PT38M</Duration>
+                  <StartTime>2021-03-25T14:39:00Z</StartTime>
+                  <EndTime>2021-03-25T15:17:00Z</EndTime>
+                  <Interchanges>0</Interchanges>
+                  <Distance>11590</Distance>
+                  <TripLeg>
+                     <LegId>1</LegId>
+                     <TimedLeg>
+                        <LegBoard>
+                           <StopPointRef>de:08212:18</StopPointRef>
+                           <StopPointName>
+                              <Text>Durlach, Turmberg (Gleis 1)</Text>
+                              <Language>de</Language>
+                           </StopPointName>
+                           <PlannedBay>
+                              <Text>Gleis 1</Text>
+                              <Language>de</Language>
+                           </PlannedBay>
+                           <ServiceDeparture>
+                              <TimetabledTime>2021-03-25T14:39:00Z</TimetabledTime>
+                              <EstimatedTime>2021-03-25T14:39:00Z</EstimatedTime>
+                           </ServiceDeparture>
+                           <StopSeqNumber>1</StopSeqNumber>
+                        </LegBoard>
+                        <LegAlight>
+                           <StopPointRef>de:08212:611</StopPointRef>
+                           <StopPointName>
+                              <Text>Oberreut Badeniaplatz</Text>
+                              <Language>de</Language>
+                           </StopPointName>
+                           <ServiceArrival>
+                              <TimetabledTime>2021-03-25T15:17:00Z</TimetabledTime>
+                              <EstimatedTime>2021-03-25T15:17:00Z</EstimatedTime>
+                           </ServiceArrival>
+                           <StopSeqNumber>26</StopSeqNumber>
+                        </LegAlight>
+                        <Service>
+                           <OperatingDayRef>2021-03-25</OperatingDayRef>
+                           <JourneyRef>kvv:21001:E:H:j21:252</JourneyRef>
+                           <LineRef>kvv:21001:E:H</LineRef>
+                           <DirectionRef>outward</DirectionRef>
+                           <Mode>
+                              <PtMode>tram</PtMode>
+                              <TramSubmode>cityTram</TramSubmode>
+                              <Name>
+                                 <Text>Straßenbahn</Text>
+                                 <Language>de</Language>
+                              </Name>
+                           </Mode>
+                           <PublishedLineName>
+                              <Text>Straßenbahn 1</Text>
+                              <Language>de</Language>
+                           </PublishedLineName>
+                           <OperatorRef>kvv:02</OperatorRef>
+                           <RouteDescription>
+                              <Text>Durlach Turmberg - Marktplatz - Europaplatz - Oberreut</Text>
+                              <Language>de</Language>
+                           </RouteDescription>
+                           <Attribute>
+                              <Text>
+                                 <Text>Niederflurwagen</Text>
+                                 <Language>de</Language>
+                              </Text>
+                              <Code>19492</Code>
+                              <Mandatory>false</Mandatory>
+                           </Attribute>
+                           <OriginText>
+                              <Text />
+                              <Language>de</Language>
+                           </OriginText>
+                           <DestinationText>
+                              <Text>Oberreut</Text>
+                              <Language>de</Language>
+                           </DestinationText>
+                        </Service>
+                        <LegTrack>
+                           <TrackSection>
+                              <TrackStart>
+                                 <StopPointRef>de:08212:18:1:1</StopPointRef>
+                                 <LocationName>
+                                    <Text>Durlach, Turmberg (Gleis 1)</Text>
+                                    <Language>de</Language>
+                                 </LocationName>
+                              </TrackStart>
+                              <TrackEnd>
+                                 <StopPointRef>de:08212:611:2:2</StopPointRef>
+                                 <LocationName>
+                                    <Text>Oberreut Badeniaplatz</Text>
+                                    <Language>de</Language>
+                                 </LocationName>
+                              </TrackEnd>
+                              <Projection>
+                                 <Position>
+                                    <Longitude>8.47851</Longitude>
+                                    <Latitude>48.99987</Latitude>
+                                 </Position>
+                                 <Position>
+                                    <Longitude>8.47855</Longitude>
+                                    <Latitude>48.99985</Latitude>
+                                 </Position>
+                                 <Position>
+                                    <Longitude>8.47860</Longitude>
+                                    <Latitude>48.99983</Latitude>
+                                 </Position>
+                              </Projection>
+                              <Duration>PT38M</Duration>
+                              <Length>11590</Length>
+                           </TrackSection>
+                        </LegTrack>
+                     </TimedLeg>
+                  </TripLeg>
+               </Trip>
+               <TripFares>
+                  <FromTripLegIdRef>1</FromTripLegIdRef>
+                  <ToTripLegIdRef>1</ToTripLegIdRef>
+                  <PassedZones>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <FareZone>
+                        <FareZoneRef>100</FareZoneRef>
+                        <FareZoneText>100</FareZoneText>
+                     </FareZone>
+                  </PassedZones>
+                  <Ticket>
+                     <TicketId>2</TicketId>
+                     <TicketName>Einzelfahrschein</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>2.600000</Price>
+                     <NetPrice>2.430000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                     <ValidityDuration>PT1H30M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>9</TicketId>
+                     <TicketName>Einzelfahrschein</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>1.500000</Price>
+                     <NetPrice>1.400000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Child</ValidFor>
+                     <ValidityDuration>PT1H30M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>16</TicketId>
+                     <TicketName>Einzelfahrkarte mit Bahncard (Erwachsene)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>2.000000</Price>
+                     <NetPrice>1.870000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                     <ValidityDuration>PT1H30M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>23</TicketId>
+                     <TicketName>4er-Karte</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>9.800000</Price>
+                     <NetPrice>9.160000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                     <ValidityDuration>PT1H30M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>28</TicketId>
+                     <TicketName>4er-Karte</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>4.900000</Price>
+                     <NetPrice>4.580000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Child</ValidFor>
+                     <ValidityDuration>PT1H30M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>32</TicketId>
+                     <TicketName>Tageskarte Citysolo (1 Pers.)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>6.700000</Price>
+                     <NetPrice>6.260000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                     <ValidityDuration>PT14H21M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>116</TicketId>
+                     <TicketName>Tageskarte Citysolo (1 Kind)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>3.600000</Price>
+                     <NetPrice>3.360000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Child</ValidFor>
+                     <ValidityDuration>PT14H21M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>34</TicketId>
+                     <TicketName>Tageskarte Cityplus (bis 5 Pers.)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>11.200000</Price>
+                     <NetPrice>10.470000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidityDuration>PT14H21M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>118</TicketId>
+                     <TicketName>Tageskarte Cityplus (bis 5 Kinder)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>6.100000</Price>
+                     <NetPrice>5.700000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidityDuration>PT14H21M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>36</TicketId>
+                     <TicketName>Tageskarte City quattro (1 Pers.)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>24.000000</Price>
+                     <NetPrice>22.430000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                     <ValidityDuration>PT14H21M</ValidityDuration>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>38</TicketId>
+                     <TicketName>9-Uhr-Karte</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>54.000000</Price>
+                     <NetPrice>50.470000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>40</TicketId>
+                     <TicketName>übertragbare Monatskarte (Monat)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>66.000000</Price>
+                     <NetPrice>61.680000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>46</TicketId>
+                     <TicketName>übertragbare Jahreskarte (Jahr)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>684.000000</Price>
+                     <NetPrice>639.250000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>52</TicketId>
+                     <TicketName>personalisierte Jahreskarte (AboFix)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>57.000000</Price>
+                     <NetPrice>53.270000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Adult</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>58</TicketId>
+                     <TicketName>Ausbildung Monatskarte</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>49.500000</Price>
+                     <NetPrice>46.260000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>100</TicketId>
+                     <TicketName>Karte ab 65 (Monat)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>48.000000</Price>
+                     <NetPrice>44.860000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Senior</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>101</TicketId>
+                     <TicketName>Karte ab 65 (Jahr)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>576.000000</Price>
+                     <NetPrice>538.320000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Senior</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>93</TicketId>
+                     <TicketName>KombiCard (Monat)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>91.000000</Price>
+                     <NetPrice>85.050000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Senior</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>94</TicketId>
+                     <TicketName>KombiCard (Jahr)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>1092.000000</Price>
+                     <NetPrice>1020.560000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Senior</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>95</TicketId>
+                     <TicketName>KombiCard-Partnerkarte (Monat)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>68.250000</Price>
+                     <NetPrice>63.790000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Senior</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>96</TicketId>
+                     <TicketName>KombiCard-Partnerkarte (Jahr)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>819.000000</Price>
+                     <NetPrice>765.420000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                     <ValidFor>Senior</ValidFor>
+                  </Ticket>
+                  <Ticket>
+                     <TicketId>97</TicketId>
+                     <TicketName>Studikarte (Semester)</TicketName>
+                     <FaresAuthorityRef>kvv</FaresAuthorityRef>
+                     <FaresAuthorityText>KVV</FaresAuthorityText>
+                     <Price>162.800000</Price>
+                     <NetPrice>152.150000</NetPrice>
+                     <Currency>EUR</Currency>
+                     <VatRate>half</VatRate>
+                     <TravelClass>second</TravelClass>
+                  </Ticket>
+               </TripFares>
+            </TripResult>
+         </TripResponse>
+      </DeliveryPayload>
+   </ServiceDelivery>
+</Trias>'
+]
+
 { #category : #requesting }
 TriasMockClient >> mockResponsesAt: aTemplateString [
 	
 	^ mockResponses at: aTemplateString ifAbsentPut: [WaitfreeQueue new]
+]
+
+{ #category : #'private - mock installing' }
+TriasMockClient >> resetMockStopEvent [
+	
+	self  resetResponseForRequest: #templateEventsRequestWithOnwardDepartures.
+]
+
+{ #category : #'private - mocking' }
+TriasMockClient >> resetResponseForRequest: aRequestTemplateAccessor [ 
+	(mockResponses at: (self perform: aRequestTemplateAccessor) put: (WaitfreeQueue new)) .
 ]
