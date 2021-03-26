@@ -110,6 +110,12 @@ TriasMockClient >> installMockStopRefinementAtRandomLocations: aNumberOfMocks [
 ]
 
 { #category : #'services - mocking' }
+TriasMockClient >> installMockStopRefinementWithInvalidCoordinates: aNumberOfMocks [
+	1 to: aNumberOfMocks do: [ :eachIndex | 
+		self installMockStopRefinement: (self mockForStopRefinementWithInvalidCoordinates ) ]
+]
+
+{ #category : #'services - mocking' }
 TriasMockClient >> installMockTrip [
 	
 	self installRepeatedMockTrip: self mockForTrip
@@ -302,6 +308,47 @@ TriasMockClient >> mockForStopRefinementAtLatitude: aLatitude longitude: aLongit
                   <GeoPosition>
                      <Longitude>', aLongitude asString ,'</Longitude>
                      <Latitude>', aLatitude asString,'</Latitude>
+                  </GeoPosition>
+               </Location>
+               <Complete>true</Complete>
+               <Probability>1</Probability>
+            </Location>
+         </LocationInformationResponse>
+      </DeliveryPayload>
+   </ServiceDelivery>
+</Trias>'
+]
+
+{ #category : #'private - mocking' }
+TriasMockClient >> mockForStopRefinementWithInvalidCoordinates [
+
+	^ '<?xml version="1.0" encoding="UTF-8"?>
+<Trias xmlns="http://www.vdv.de/trias" version="1.1">
+   <ServiceDelivery>
+      <ResponseTimestamp xmlns="http://www.siri.org.uk/siri">2021-03-26T09:08:30Z</ResponseTimestamp>
+      <ProducerRef xmlns="http://www.siri.org.uk/siri">EFAController10.3.17.15-EFA01</ProducerRef>
+      <Status xmlns="http://www.siri.org.uk/siri">true</Status>
+      <MoreData>false</MoreData>
+      <Language>de</Language>
+      <DeliveryPayload>
+         <LocationInformationResponse>
+            <Location>
+               <Location>
+                  <StopPoint>
+                     <StopPointRef>de:08236:2315</StopPointRef>
+                     <StopPointName>
+                        <Text>Diefenbach (Württ), Schule</Text>
+                        <Language>de</Language>
+                     </StopPointName>
+                     <LocalityRef>8236061:1</LocalityRef>
+                  </StopPoint>
+                  <LocationName>
+                     <Text>Diefenbach (Württ)</Text>
+                     <Language>de</Language>
+                  </LocationName>
+                  <GeoPosition>
+                     <Longitude>2147483647.00000</Longitude>
+                     <Latitude>2147483647.00000</Latitude>
                   </GeoPosition>
                </Location>
                <Complete>true</Complete>
