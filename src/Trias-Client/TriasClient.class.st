@@ -539,6 +539,7 @@ TriasClient >> getTrip: requestTemplate from: anOriginStopPointRef to: aDestinat
 
 	responseElement := (triasDocument findElementNamed: 'TripResponse').
 	responseElement ifNil: [^ Error signal: 'Invalid Trias Request'].
+	self handleErrorIn: responseElement.
 	^ (responseElement allElementsNamed: 'TripResult') asOrderedCollection collect: [:eachXMLElement | 
 		TriasTripResult fromXML: eachXMLElement
 		].
@@ -546,7 +547,7 @@ TriasClient >> getTrip: requestTemplate from: anOriginStopPointRef to: aDestinat
 
 { #category : #requesting }
 TriasClient >> getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef [
-
+	
 	^ self getTripFrom: anOriginStopPointRef to: aDestinationStopPointRef at: DateAndTime now
 ]
 
